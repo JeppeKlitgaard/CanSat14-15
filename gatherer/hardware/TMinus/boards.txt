@@ -1,0 +1,22 @@
+# See: http://code.google.com/p/arduino/wiki/Platforms
+
+##############################################################
+
+TMinus1.name=TMinus1
+
+TMinus1.upload.protocol=wiring
+TMinus1.upload.maximum_size=258048
+TMinus1.upload.speed=57600
+
+TMinus1.bootloader.low_fuses=0xFF
+TMinus1.bootloader.high_fuses=0x98
+TMinus1.bootloader.extended_fuses=0xFF
+TMinus1.bootloader.path=stk500v2
+TMinus1.bootloader.file=stk500boot_v2_mega2560.hex
+TMinus1.bootloader.unlock_bits=0x3F
+TMinus1.bootloader.lock_bits=0x0F
+
+TMinus1.build.mcu=atmega2560
+TMinus1.build.f_cpu=8000000L
+TMinus1.build.core=arduino:arduino
+TMinus1.build.variant=TMinus
