@@ -1,0 +1,4 @@
+pyserial
+flask
+flask_bootstrap
+tornado
