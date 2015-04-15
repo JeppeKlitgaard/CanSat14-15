@@ -23,7 +23,7 @@ void setup() {
   
    // call it with declarations for sensor scales and data rates:
   uint16_t status = dof.begin(dof.G_SCALE_2000DPS,
-                              dof.A_SCALE_6G, dof.M_SCALE_2GS);
+                              dof.A_SCALE_16G, dof.M_SCALE_2GS);
 
   // make sure communication with 9degree sensor was successful.
   Serial1.print("LSM9DS0 WHO_AM_I's returned: 0x");
@@ -41,7 +41,7 @@ void setup() {
 void loop() {
 
   send_basics();           // Sends the collected data, which is read in the send_basics function
-  delay(200);              // wait 200 ms
+  delay(100);              // wait before sending next data-batch
 
 }
 
