@@ -53,10 +53,9 @@ void loop() {
   
   while(Serial3.available()) {
     int c = Serial3.read();
-    if(gps.encode(c)) {
-      getgps(gps);
-    }
+    gps.encode(c);
   }
+  getgps(gps);
   
   Serial1.println(""); //Print new-line
   delay(100);              // wait before sending next data-batch
