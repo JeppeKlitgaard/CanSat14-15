@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div id="graph-container">
+    <div class="row">
+        <div class="col-md-6">
+            <div id="graph-temp">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div id="graph-press">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div id="graph-height">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div id="graph-gyr">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script>
+var maxPoints = 250;
+var series = {}
+
+var baseSettings = {
+    rangeSelector: {
+        enabled: false
+    },
+
+    exporting: {
+        enabled: false
+    },
+
+    credits: {
+        enabled: false
+    }
+};
+
+Highcharts.setOptions({
+    global: {
+        useUTC: false,
+    }
+});
+
+function createGraph(domIdent, dataIdent, title, xText, yText, seriesInitData) {
+    $(domIdent).highcharts('StockChart', $.extend({}, baseSettings, {
+        chart: {
+            events: {
+                load: function() {
+                series[dataIdent] = this.series[0];
+                }
+            }
+        },
+
+        title: {
+            text: title
+        },
+
+        xAxis: {
+            title: {
+                text: xText
+            },
+            labels: {
+                enabled: false
+            }
+        },
+
+        yAxis: {
+            title: {
+                text: yText
+            }
+        },
+
+        series: [
+            {
+                name: dataIdent,
+                data: seriesInitData
+            }
+        ]
+    }));
+}
+
+$(function () {
+    createGraph("#graph-temp", "NTC", "Temperature", "Seconds since boot",
+                "Temperature in degrees celsius", []);
+
+    createGraph("#graph-press", "Pressure", "Pressure", "Seconds since boot",
+                "Pressure in kilopascal", []);
+
+    createGraph("#graph-height", "Height", "Height", "Seconds since boot",
+                "Height in metres", []);
+
+    createGraph("#graph-gyr", "Gyroscope", "Rotational speed", "Seconds since boot",
+                "Rounds per minute", []);
+});
+
+// ENSURE WEBSOCKET ADDRESS IS CORRECT. NOT LOCALHOST, YOU DUMMY.
+var socket = new WebSocket("ws://10.42.0.1:8081/ws");
+
+socket.onmessage = function(event){
+    json_obj = JSON.parse(event.data);
+    console.log(json_obj)
+
+    should_shift = series["Temp_NTC"].activePointCount >= maxPoints;
+    series["Temp_NTC"].addPoint([json_obj["Time"], json_obj["Temp_NTC"]], true, should_shift)
+
+    should_shift = series["Press"].activePointCount >= maxPoints;
+    series["Press"].addPoint([json_obj["Time"], json_obj["Press"]], true, should_shift);
+
+    should_shift = series["Height"].activePointCount >= maxPoints;
+    series["Height"].addPoint([json_obj["Time"], json_obj["Height"]], true, should_shift);
+
+    should_shift = series["Gyr"].activePointCount >= maxPoints;
+    series["Gyr"].addPoint([json_obj["Time"], json_obj["Gyr"]], true, should_shift);
+}
+
+
+</script>
+{% endblock %}

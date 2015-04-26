@@ -16,9 +16,24 @@ def about():
 
 
 @app.route("/")
+@app.route("/index")
+def index():
+    return render_template("index.html")
+
+
+@app.route("/live")
+def live():
+    return render_template("live.html")
+
+
 @app.route("/graph")
 def graph():
     return render_template("graph.html")
+
+
+@app.route("/replay")
+def replay():
+    return render_template("replay.html")
 
 
 @app.route("/graph_static_droptest")
