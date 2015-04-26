@@ -1,7 +1,7 @@
 import time
 import random
 from .parse import HEAD, HEAD_SEP, DATA_SEP, FIELD_SEP
-from .config import FAKER_MIN, FAKER_MAX, COM_FILE
+from .config import FAKER, GENERAL
 
 
 class Faker(object):
@@ -16,14 +16,14 @@ class Faker(object):
 
     ABS_FIELDS = FIELDS
 
-    RAND_MIN = FAKER_MIN
-    RAND_MAX = FAKER_MAX
+    RAND_MIN = FAKER["min_value"]
+    RAND_MAX = FAKER["max_value"]
 
     def __init__(self, data_interval=0.1, verbose=True,
                  malformed_line_chance=0):
         self.data_interval = data_interval
         self.last_data_read_time = 0
-        self.file_handle = open(COM_FILE, "w")
+        self.file_handle = open(GENERAL["com_file"], "w")
         self.verbose = verbose
         self.malformed_line_chance = malformed_line_chance
         self.start_time = time.time()
@@ -69,5 +69,6 @@ class Faker(object):
 
 
 if __name__ == '__main__':
-    faker = Faker(data_interval=0.5, malformed_line_chance=0.1)
+    faker = Faker(data_interval=FAKER["data_interval"],
+                  malformed_line_chance=FAKER["malformed_line_chance"])
     faker.start()

@@ -1,4 +1,0 @@
-# WEBSERVER
-PORT = 80
-ADDRESS = "0.0.0.0"
-DEBUG = True

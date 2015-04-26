@@ -1,4 +1,5 @@
 import os
+import time
 
 
 def discover_serial_port():
@@ -21,4 +22,11 @@ def convert_time(time):
 
 
 def average(iterable):
+    """
+    Returns the average of a list of numbers.
+    """
     return sum(iterable) / len(iterable)
+
+
+def miniterm_get_log_file():
+    return "cansat_{}.log".format(str(int(time.time())))

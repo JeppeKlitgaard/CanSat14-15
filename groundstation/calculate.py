@@ -1,7 +1,5 @@
 import math
-from .config import GYRO_SENSITIVITY, GYRO_CALIBRATION_FACTOR
-from .config import (PRESS_GROUND, TEMP_GROUND, TEMPERATURE_GRADIENT,
-                     R_CONSTANT, GRAVITATIONAL_ACCELLERATION)
+from .config import CALCULATE
 
 
 def calculate_temp_LM35(raw_val):
