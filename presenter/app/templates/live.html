@@ -29,9 +29,14 @@
 {% block scripts %}
 {{super()}}
 <script>
+{% if config.DEBUG %}
+var wsAddress = "ws://localhost:8081/ws"
+{% else %}
 var wsAddress = "ws://10.42.0.1:8081/ws"
+{% endif %}
+
 var maxPoints = 250;
-var series = {}
+var series = []
 
 var baseSettings = {
     rangeSelector: {
@@ -64,7 +69,7 @@ function createGraph(domIdent, dataIdent, title, xText, yText, seriesInitData) {
         chart: {
             events: {
                 load: function() {
-                series[dataIdent] = this.series[0];
+                series.push(this.series[0]);
                 }
             }
         },
@@ -117,17 +122,10 @@ socket.onmessage = function(event){
     console.log(json_obj)
     {% endif %}
 
-    should_shift = series["Temp_NTC"].activePointCount >= maxPoints;
-    series["Temp_NTC"].addPoint([json_obj["Time"], json_obj["Temp_NTC"]], true, should_shift)
-
-    should_shift = series["Press"].activePointCount >= maxPoints;
-    series["Press"].addPoint([json_obj["Time"], json_obj["Press"]], true, should_shift);
-
-    should_shift = series["Height"].activePointCount >= maxPoints;
-    series["Height"].addPoint([json_obj["Time"], json_obj["Height"]], true, should_shift);
-
-    should_shift = series["Gyr"].activePointCount >= maxPoints;
-    series["Gyr"].addPoint([json_obj["Time"], json_obj["Gyr"]], true, should_shift);
+    series.forEach(function(entry) {
+        should_shift = entry.activePointCount >= maxPoints;
+        entry.addPoint([json_obj["Time"], json_obj[entry.name]], true, should_shift);
+    });
 }
 
 
