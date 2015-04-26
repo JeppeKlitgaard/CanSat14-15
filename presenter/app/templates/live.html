@@ -29,6 +29,7 @@
 {% block scripts %}
 {{super()}}
 <script>
+var wsAddress = "ws://10.42.0.1:8081/ws"
 var maxPoints = 250;
 var series = {}
 
@@ -104,8 +105,7 @@ $(function () {
                 "Rounds per minute", []);
 });
 
-// ENSURE WEBSOCKET ADDRESS IS CORRECT. NOT LOCALHOST, YOU DUMMY.
-var socket = new WebSocket("ws://10.42.0.1:8081/ws");
+var socket = new WebSocket(wsAddress);
 
 socket.onmessage = function(event){
     json_obj = JSON.parse(event.data);
