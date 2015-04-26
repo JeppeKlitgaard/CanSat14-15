@@ -1,0 +1,43 @@
+{% extends "bootstrap/base.html" %}
+
+{% block scripts %}
+{{super()}}
+<script src="{{url_for('static', filename='js/highcharts.js')}}"></script>
+{% endblock %}
+
+{% block title %}SG - Live data presenter - SG Cansat{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-default">
+        <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">SG CanSat Group 2014/2015</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="/graph">Graphs</a></li>
+                <li><a href="/graph_static_droptest">Data from drop test</a></li>
+                <li><a href="/graph_static_rocket">Data from rocket launch</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://www.gymnasiet.dk/andre-sprog/silkeborg-gymnasium/">Silkeborg Gymnasium</a></li>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+{% endblock %}
+
+{% block content %}
+{% endblock %}

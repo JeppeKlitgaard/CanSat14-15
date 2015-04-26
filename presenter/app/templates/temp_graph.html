@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div id="graph-container">
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script>
+maxPoints = 250;
+series = {}
+
+$(function () {
+
+    Highcharts.setOptions({
+        global : {
+            useUTC : false
+        }
+    });
+
+    // Create the chart
+    $('#graph-container').highcharts('StockChart', {
+        chart : {
+            events : {
+                load : function () {
+                    series["Temp"] = this.series[0];
+                }
+            }
+        },
+
+        rangeSelector: {
+            buttons: [{
+                count: 1,
+                type: 'minute',
+                text: '1M'
+            }, {
+                count: 5,
+                type: 'minute',
+                text: '5M'
+            }, {
+                type: 'all',
+                text: 'All'
+            }],
+            inputEnabled: false,
+            selected: 0
+        },
+
+        title: {
+            text: "Temperature in degrees celsius"
+        },
+
+        exporting: {
+            enabled: false
+        },
+
+        xAxis: {
+            title: {
+                text: "Seconds since boot"
+            },
+            labels: {
+                enabled: false
+            }
+        },
+
+        yAxis: {
+            title: {
+                text: "Temperature in degrees celsius"
+            }
+        },
+
+        series: [{
+            name: 'Random data',
+            data: []
+        }]
+    });
+
+});
+
+
+var socket = new WebSocket("ws://localhost:8081/ws");
+
+socket.onmessage = function(event){
+    json_obj = JSON.parse(event.data);
+    console.log(json_obj)
+
+    should_shift = series["Temp"].activePointCount >= maxPoints;
+    series["Temp"].addPoint([json_obj["Time"], json_obj["Temp"]], true, should_shift)
+}
+
+
+</script>
+{% endblock %}
