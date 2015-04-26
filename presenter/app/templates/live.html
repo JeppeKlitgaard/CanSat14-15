@@ -44,6 +44,12 @@ var baseSettings = {
 
     credits: {
         enabled: false
+    },
+
+    xAxis: {
+        labels: {
+            enabled: false
+        }
     }
 };
 
@@ -71,9 +77,6 @@ function createGraph(domIdent, dataIdent, title, xText, yText, seriesInitData) {
             title: {
                 text: xText
             },
-            labels: {
-                enabled: false
-            }
         },
 
         yAxis: {
