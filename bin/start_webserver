@@ -7,4 +7,4 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 source /home/jeppe/.virtualenvs/CanSat14-15/bin/activate
-python presenter/run.py
+python -m groundstation.run_presenter
