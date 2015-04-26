@@ -1,0 +1,16 @@
+[connection]
+id=SG Can Science
+uuid=647ef288-e8f3-498f-8a80-6f6ce69ff340
+type=wifi
+
+[wifi]
+ssid=SG Can Science
+mode=ap
+mac-address=28:B2:BD:6A:5C:7F
+
+[ipv6]
+method=auto
+ip6-privacy=0
+
+[ipv4]
+method=shared
