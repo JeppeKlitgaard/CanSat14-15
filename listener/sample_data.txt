@@ -1,0 +1,1 @@
+SGCanScience>AccX:{}|AccY:{}|AccZ:{}|GyrX:{}|GyrY:{}|GyrZ:{}|MagX:{}|MagY:{}|MagZ{}|
