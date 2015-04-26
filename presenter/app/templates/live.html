@@ -109,7 +109,10 @@ var socket = new WebSocket(wsAddress);
 
 socket.onmessage = function(event){
     json_obj = JSON.parse(event.data);
+
+    {% if config.DEBUG %}
     console.log(json_obj)
+    {% endif %}
 
     should_shift = series["Temp_NTC"].activePointCount >= maxPoints;
     series["Temp_NTC"].addPoint([json_obj["Time"], json_obj["Temp_NTC"]], true, should_shift)
