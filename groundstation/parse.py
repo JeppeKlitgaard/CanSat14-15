@@ -1,5 +1,6 @@
-from .datatypes import TemperatureLM35
-from .exceptions import ParseError, MalformedPacket
+from .exceptions import ParseError, MalformedPacket, InvalidLine
+from .calculate import (calculate_temp_NTC, calculate_press, calculate_height,
+                        calculate_gyr)
 
 import re
 
@@ -59,5 +60,38 @@ def parse_line(line):
     for required_field in REQUIRED_FIELDS:
         if required_field not in data.keys():
             raise ParseError("A field went missing!")
+
+    return data
+
+
+def easy_parse_line(line, verbose=True):
+    """
+    Parse data with a one-liner!
+
+    Raises InvalidLine if ``line`` is not valid.
+    """
+    try:
+        validate_line(line)
+    except MalformedPacket:
+        if verbose:
+            line = line.replace("\n", "")
+            print("[WARNING] Got malformed packet: {}".format(line))
+
+        raise InvalidLine
+
+    try:
+        raw_data = parse_line(line)
+    except ParseError as e:
+        if verbose:
+            print("[WARNING] Got a ParseError: {} on line {}".format(e, line))
+
+        raise InvalidLine
+
+    data = {}
+    data["Time"] = raw_data["Time"]
+    data["NTC"] = calculate_temp_NTC(raw_data["NTC"])
+    data["Pressure"] = calculate_press(raw_data["Press"])
+    data["Height"] = calculate_height(data["Pressure"])
+    data["Gyroscope"] = calculate_gyr(raw_data["GyrZ"]) / 360 * 60  # RPM
 
     return data

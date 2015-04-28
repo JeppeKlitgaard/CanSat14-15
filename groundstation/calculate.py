@@ -2,6 +2,10 @@ import math
 from .config import CALCULATE
 
 
+TEMP_GROUND = 2
+PRESS_GROUND = 100
+
+
 def calculate_temp_LM35(raw_val):
     """
     """
@@ -34,9 +38,9 @@ def calculate_height(press_air):
     """
     temp = TEMP_GROUND + 273.15  # Convert to kelvin
 
-    a = TEMPERATURE_GRADIENT
-    R = R_CONSTANT
-    grav = GRAVITATIONAL_ACCELLERATION
+    a = CALCULATE["height"]["temperature_gradient"]
+    R = CALCULATE["height"]["gas_constant"]
+    grav = CALCULATE["height"]["gravitational_accelleration"]
 
     height = (temp / a) * ((press_air / PRESS_GROUND)**(-((a * R) / grav)) - 1)
 
@@ -59,7 +63,9 @@ def calculate_gyr(raw_val):
     """
     :rtype: integer, degrees per second.
     """
-    return (raw_val / (2**15 - 1)) * GYRO_SENSITIVITY * GYRO_CALIBRATION_FACTOR
+    s = CALCULATE["gyro"]["sensitivity"]
+    c = CALCULATE["gyro"]["calibration_factor"]
+    return (raw_val / (2**15 - 1)) * s * c
 
 
 def calculate_mag(raw_val):

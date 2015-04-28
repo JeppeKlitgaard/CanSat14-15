@@ -4,3 +4,7 @@ class ParseError(Exception):
 
 class MalformedPacket(ParseError):
     pass
+
+
+class InvalidLine(ParseError):
+    pass

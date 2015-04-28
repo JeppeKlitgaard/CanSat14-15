@@ -4,8 +4,6 @@ PRESENTER = {
     "port": 80,
     "address": BIND_ADDRESS,
     "debug": True,
-    "data_base_path": "data",
-    "data_config": "data_config.json"
 }
 
 FAKER = {
@@ -17,6 +15,8 @@ FAKER = {
 
 GENERAL = {
     "com_file": "listener_com.log",
+    "data_base_path": "data",
+    "data_config": "data_config.json"
 }
 
 CALCULATE = {
