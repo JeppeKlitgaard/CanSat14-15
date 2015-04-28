@@ -1,104 +1,8 @@
-{% extends "layout.html" %}
-
-{% block content %}
-<div id="graph-container">
-    <div class="row">
-        <div class="col-md-6">
-            <div id="graph-temp">
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div id="graph-press">
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <div id="graph-height">
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div id="graph-gyr">
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+{% extends "graph_base.html" %}
 
 {% block scripts %}
 {{super()}}
 <script>
-{% if config.DEBUG %}
-var wsAddress = "ws://localhost:8081/ws"
-{% else %}
-var wsAddress = "ws://10.42.0.1:8081/ws"
-{% endif %}
-
-var maxPoints = 250;
-var series = []
-
-var baseSettings = {
-    rangeSelector: {
-        enabled: false
-    },
-
-    exporting: {
-        enabled: false
-    },
-
-    credits: {
-        enabled: false
-    },
-
-    xAxis: {
-        labels: {
-            enabled: false
-        }
-    }
-};
-
-Highcharts.setOptions({
-    global: {
-        useUTC: false,
-    }
-});
-
-function createGraph(domIdent, dataIdent, title, xText, yText, seriesInitData) {
-    $(domIdent).highcharts('StockChart', $.extend({}, baseSettings, {
-        chart: {
-            events: {
-                load: function() {
-                series.push(this.series[0]);
-                }
-            }
-        },
-
-        title: {
-            text: title
-        },
-
-        xAxis: {
-            title: {
-                text: xText
-            },
-        },
-
-        yAxis: {
-            title: {
-                text: yText
-            }
-        },
-
-        series: [
-            {
-                name: dataIdent,
-                data: seriesInitData
-            }
-        ]
-    }));
-}
-
 $(function () {
     createGraph("#graph-temp", "NTC", "Temperature", "Seconds since boot",
                 "Temperature in degrees celsius", []);
@@ -113,7 +17,12 @@ $(function () {
                 "Rounds per minute", []);
 });
 
-var socket = new WebSocket(wsAddress);
+{% if config.DEBUG %}
+var socket = new WebSocket("ws://localhost:8081/ws");
+{% else %}
+var socket = new WebSocket("ws://10.42.0.1:8081/ws");
+{% endif %}
+
 
 socket.onmessage = function(event){
     json_obj = JSON.parse(event.data);

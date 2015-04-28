@@ -1,6 +1,25 @@
 from flask import render_template, send_from_directory
 from . import app
 import os
+from ..config import PRESENTER
+import json
+
+data_config_path = os.path.abspath(os.path.join(PRESENTER["data_base_path"],
+                                                PRESENTER["data_config"]))
+
+
+@app.context_processor
+def dropdown_processor():
+    """
+    Context processor that makes the get_dropdown_data function
+    available to all templates.
+    """
+    def get_dropdown_data():
+        with open(data_config_path, "r") as f:
+            data = json.load(f)
+
+        return data
+    return dict(get_dropdown_data=get_dropdown_data)
 
 
 @app.route("/favicon.ico")
@@ -34,14 +53,3 @@ def graph(data_id):
 @app.route("/replay/<data_id>")
 def replay(data_id):
     return render_template("replay.html", data_id=data_id)
-
-
-# TODO REMOVE
-@app.route("/graph_static_droptest")
-def graph_static_droptest():
-    return render_template("graph_static_droptest.html")
-
-
-@app.route("/graph_static_rocket")
-def graph_static_rocket():
-    return render_template("graph_static_rocket.html")

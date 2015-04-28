@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div id="graph-container">
+    <div class="row">
+        <div class="col-md-6">
+            <div id="graph-temp">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div id="graph-press">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div id="graph-height">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div id="graph-gyr">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script src="{{url_for('static', filename='js/graph.js')}}"></script>
+{% endblock %}
