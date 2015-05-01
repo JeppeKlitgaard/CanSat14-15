@@ -1,0 +1,15 @@
+[
+    {
+        "id": "andoeya_droptest",
+        "name": "Droptest - Andøya Space Centre",
+        "file": "andoeya_droptest.log"
+    },
+    "SEPARATOR",
+    {
+        "id": "andoeya_rocket_launch",
+        "name": "Rocket Launch - Andøya Space Centre",
+        "file": "andoeya_rocket_launch.log",
+        "start_time": 1603538,
+        "end_time": -1
+    }
+]
