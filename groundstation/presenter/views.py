@@ -60,18 +60,21 @@ def live():
 
 @app.route("/graph/<data_id>")
 def graph(data_id):
-    with open(_get_data_file(data_id), "r") as f:
-        data_temp = []
-        data_press = []
-        data_height = []
-        data_gyro = []
+    try:
+        with open(_get_data_file(data_id), "r") as f:
+            data_temp = []
+            data_press = []
+            data_height = []
+            data_gyro = []
 
-        for line in f:
-            values = easy_parse_line(line)
-            data_temp.append([values["Time"], values["NTC"]])
-            data_press.append([values["Time"], values["Pressure"]])
-            data_height.append([values["Time"], values["Height"]])
-            data_gyro.append([values["Time"], values["Gyroscope"]])
+            for line in f:
+                values = easy_parse_line(line)
+                data_temp.append([values["Time"], values["NTC"]])
+                data_press.append([values["Time"], values["Pressure"]])
+                data_height.append([values["Time"], values["Height"]])
+                data_gyro.append([values["Time"], values["Gyroscope"]])
+    except FileNotFoundError:
+        abort(404)
 
     for lst in [data_temp, data_press, data_height, data_gyro]:
         # Sort by time

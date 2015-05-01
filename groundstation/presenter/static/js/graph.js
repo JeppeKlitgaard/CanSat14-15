@@ -15,9 +15,7 @@ var baseSettings = {
     },
 
     xAxis: {
-        labels: {
-            enabled: false
-        }
+        ordinal: false
     }
 };
 
@@ -44,6 +42,19 @@ function createGraph(domIdent, dataIdent, title, xText, yText, seriesInitData) {
         xAxis: {
             title: {
                 text: xText
+            },
+            labels: {
+                enabled: true,
+                formatter: function(){return this.value;}
+            }
+        },
+
+        navigator: {
+            xAxis: {
+                labels: {
+                    enabled: true,
+                    formatter: function(){return this.value;}
+                }
             },
         },
 
