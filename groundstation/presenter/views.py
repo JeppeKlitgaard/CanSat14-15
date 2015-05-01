@@ -106,7 +106,7 @@ def graph(data_id):
             data_gyro = []
 
             for line in f:
-                values = easy_parse_line(line)
+                values = easy_parse_line(line, data_config=data_conf)
 
                 time = convert_time(values["Time"] - data_conf["start_time"])
 

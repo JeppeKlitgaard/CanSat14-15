@@ -6,6 +6,7 @@ data received from the CanSat (or Faker).
 from .exceptions import ParseError, MalformedPacket, InvalidLine
 from .calculate import (calculate_temp_NTC, calculate_press, calculate_height,
                         calculate_gyr)
+from .config import EXAMPLE_DATA_CONFIG
 
 import re
 
@@ -78,7 +79,7 @@ def parse_line(line):
     return data
 
 
-def easy_parse_line(line, verbose=True):
+def easy_parse_line(line, data_config=EXAMPLE_DATA_CONFIG, verbose=True):
     """
     Parse data with a one-liner!
 
@@ -105,7 +106,9 @@ def easy_parse_line(line, verbose=True):
     data["Time"] = raw_data["Time"]
     data["NTC"] = calculate_temp_NTC(raw_data["NTC"])
     data["Pressure"] = calculate_press(raw_data["Press"])
-    data["Height"] = calculate_height(data["Pressure"])
+    data["Height"] = calculate_height(data["Pressure"],
+                                      data_config["ground_pressure"],
+                                      data_config["ground_temperature"])
     data["Gyroscope"] = calculate_gyr(raw_data["GyrZ"]) / 360 * 60  # RPM
 
     return data

@@ -44,18 +44,18 @@ def calculate_press(raw_val):
     return ((100 / 921) * raw_val) + 10
 
 
-def calculate_height(press_air):
+def calculate_height(air_press, ground_press, ground_temp):
     """
     Calculates the height based on the pressure, pressure at ground level,
     and temperature at ground level.
     """
-    temp = TEMP_GROUND + 273.15  # Convert to kelvin
+    temp = ground_temp + 273.15  # Convert to kelvin
 
     a = CALCULATE["height"]["temperature_gradient"]
     R = CALCULATE["height"]["gas_constant"]
     grav = CALCULATE["height"]["gravitational_accelleration"]
 
-    height = (temp / a) * ((press_air / PRESS_GROUND)**(-((a * R) / grav)) - 1)
+    height = (temp / a) * ((air_press / ground_press)**(-((a * R) / grav)) - 1)
 
     return height
 

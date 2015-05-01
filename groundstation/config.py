@@ -40,12 +40,13 @@ CALCULATE = {
         "gravitational_accelleration": 9.82
     }
 }
-# PRESS_GROUND = 100.75  # in kilopascal, droptest
-# TEMP_GROUND = 7.2  # in degrees celsius, droptest
-TEMP_GROUND = 5.3
-PRESS_GROUND = 98.8
 
-# POST PROCESSING
-MIN_TIME = 1564364
-MAX_TIME = 9999999
-PRESSURE_AVERAGE_AMOUNT = 30
+EXAMPLE_DATA_CONFIG = {
+    "id": "identifier",
+    "name": "name",
+    "file": "file.log",
+    "start_time": 0,
+    "end_time": -1,
+    "ground_temperature": 0,
+    "ground_pressure": 100
+}
