@@ -14,23 +14,17 @@ from pprint import pprint
 
 import json
 
-from .config import COM_FILE
+from .config import GENERAL, FEEDER, BIND_ADDRESS
 from .parse import validate_line, parse_line
 from .exceptions import MalformedPacket
 from .calculate import (calculate_temp_NTC, calculate_press, calculate_height,
                         calculate_gyr)
 
-PORT = 8081
-
-GETTER_FREQUENCY = 10  # MS
-POSTER_FREQUENCY = 100  # MS
-
-com_handle = open(COM_FILE, "r")
+com_handle = open(GENERAL["com_file"], "r")
 
 clients = []
 
-CACHE_SIZE = 100  # How many data points to keep in cache.
-cache = deque(maxlen=CACHE_SIZE)
+cache = deque(maxlen=FEEDER["cache_size"])
 
 
 class DataWebSocket(tornado.websocket.WebSocketHandler):
@@ -116,10 +110,10 @@ app = tornado.web.Application([(r"/ws", DataWebSocket)])
 
 
 if __name__ == '__main__':
-    app.listen(PORT, "0.0.0.0")
+    app.listen(FEEDER["port"], BIND_ADDRESS)
     loop = tornado.ioloop.IOLoop.instance()
 
-    getter = tornado.ioloop.PeriodicCallback(get_data, GETTER_FREQUENCY,
+    getter = tornado.ioloop.PeriodicCallback(get_data, FEEDER["frequency"],
                                              io_loop=loop)
     getter.start()
     loop.start()
