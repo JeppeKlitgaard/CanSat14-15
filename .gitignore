@@ -51,7 +51,7 @@ coverage.xml
 *.pot
 
 # Django stuff:
-*.log
+# *.log
 
 # Sphinx documentation
 docs/_build/
@@ -80,3 +80,4 @@ sftp-config.json
 *.csv
 images
 to_be_handled
+com_file
