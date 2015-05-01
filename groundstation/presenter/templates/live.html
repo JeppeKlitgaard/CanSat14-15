@@ -18,9 +18,9 @@ $(function () {
 });
 
 {% if config.DEBUG %}
-var socket = new WebSocket("ws://localhost:8081/ws");
+var socket = new WebSocket("ws://localhost:8081/live");
 {% else %}
-var socket = new WebSocket("ws://10.42.0.1:8081/ws");
+var socket = new WebSocket("ws://10.42.0.1:8081/live");
 {% endif %}
 
 

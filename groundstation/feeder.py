@@ -26,10 +26,15 @@ clients = []
 cache = deque(maxlen=FEEDER["cache_size"])
 
 
-class DataWebSocket(tornado.websocket.WebSocketHandler):
+class BaseWebSocket(tornado.websocket.WebSocketHandler):
+    """
+    A base class for all WebSocket interfaces.
+    """
     def check_origin(self, origin):
         return True  # All clients are welcome
 
+
+class LiveDataWebSocket(BaseWebSocket):
     def open(self):
         clients.append(self)
         print("A client has opened a connection.")
@@ -105,7 +110,7 @@ def post_data(data):
     broadcast(json_data)
 
 
-app = tornado.web.Application([(r"/ws", DataWebSocket)])
+app = tornado.web.Application([(r"/live", LiveDataWebSocket)])
 
 
 if __name__ == '__main__':
