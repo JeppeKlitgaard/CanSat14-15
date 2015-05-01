@@ -1,188 +1,21 @@
-{% extends "layout.html" %}
-
-{% block content %}
-<div id="graph-container">
-    <div class="row">
-        <div class="col-md-6">
-            <div id="graph-temp">
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div id="graph-press">
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <div id="graph-height">
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div id="graph-gyr">
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+{% extends "graph_base.html" %}
 
 {% block scripts %}
 {{super()}}
 <script>
 all_data = {{ graph_data|safe }}
 $(function () {
+    createGraph("#graph-temp", "NTC", "Temperature", "Seconds since boot",
+                "Temperature in degrees celsius", all_data["Temp"]);
 
-    Highcharts.setOptions({
-        global : {
-            useUTC : false,
-        }
-    });
+    createGraph("#graph-press", "Pressure", "Pressure", "Seconds since boot",
+                "Pressure in kilopascal", all_data["Press"]);
 
-    // Create the chart
-    $('#graph-temp').highcharts('StockChart', {
-        title: {
-            text: "Temperature"
-        },
-        rangeSelector: {
-            enabled: false
-        },
+    createGraph("#graph-height", "Height", "Height", "Seconds since boot",
+                "Height in metres", all_data["Height"]);
 
-        exporting: {
-            enabled: false
-        },
-
-        xAxis: {
-            ordinal: false,
-            title: {
-                text: "Seconds since boot"
-            },
-            labels: {
-                enabled: true,
-                formatter: function(){return this.value;},
-            }
-        },
-
-        yAxis: {
-            title: {
-                text: "Temperature in degrees celsius"
-            }
-        },
-
-        series: [
-            {
-                name: 'NTC',
-                data: all_data["Temp"]
-            },
-        ]
-    });
-
-    // Create the chart
-    $('#graph-press').highcharts('StockChart', {
-        title: {
-            text: "Pressure"
-        },
-        rangeSelector: {
-            enabled: false
-        },
-
-        exporting: {
-            enabled: false
-        },
-
-        xAxis: {
-            ordinal: false,
-            title: {
-                text: "Seconds since boot"
-            },
-            labels: {
-                enabled: true,
-                formatter: function(){return this.value;},
-            }
-        },
-
-        yAxis: {
-            title: {
-                text: "Pressure in kilopascal"
-            }
-        },
-
-        series: [{
-            name: 'Pressure',
-            data: all_data["Press"]
-        }]
-    });
-
-    // Create the chart
-    $('#graph-height').highcharts('StockChart', {
-        title: {
-            text: "Height"
-        },
-        rangeSelector: {
-            enabled: false
-        },
-
-        exporting: {
-            enabled: false
-        },
-
-        xAxis: {
-            title: {
-                text: "Seconds since boot",
-            },
-            ordinal: false,
-            labels: {
-                enabled: true,
-                formatter: function(){return this.value;},
-            }
-        },
-
-        yAxis: {
-            title: {
-                text: "Height in metres"
-            }
-        },
-
-        series: [{
-            name: 'Height',
-            data: all_data["Height"]
-        }]
-    });
-
-    // Create the chart
-    $('#graph-gyr').highcharts('StockChart', {
-        title: {
-            text: "Rotational speed"
-        },
-        rangeSelector: {
-            enabled: false
-        },
-
-        exporting: {
-            enabled: false
-        },
-
-        xAxis: {
-            ordinal: false,
-            title: {
-                text: "Seconds since boot"
-            },
-            labels: {
-                enabled: true,
-                formatter: function(){return this.value;},
-            }
-        },
-
-        yAxis: {
-            title: {
-                text: "Rounds per minute"
-            }
-        },
-
-        series: [{
-            name: 'Gyr',
-            data: all_data["Gyro"]
-        }]
-    });
+    createGraph("#graph-gyr", "Gyroscope", "Rotational speed", "Seconds since boot",
+                "Rounds per minute", all_data["Gyro"]);
 });
 
 
