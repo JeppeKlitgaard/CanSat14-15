@@ -14,8 +14,8 @@ from pprint import pprint
 import json
 
 from .config import GENERAL, FEEDER, BIND_ADDRESS
-from .parse import validate_line, parse_line
-from .exceptions import MalformedPacket
+from .parse import easy_parse_line
+from .exceptions import InvalidLine
 from .calculate import (calculate_temp_NTC, calculate_press, calculate_height,
                         calculate_gyr)
 
@@ -70,38 +70,13 @@ def get_data():
         line_buf = ""
 
     try:
-        validate_line(line)
-    except MalformedPacket:
-        line = line.replace("\n", "")
-        print("[WARNING] Got malformed packet: {}".format(line))
+        data = easy_parse_line(line)
+    except InvalidLine:
         return
-
-    data = handle_line(line)
 
     post_data(data)
 
     print(line, end="")
-
-
-def handle_line(line):
-    data = parse_line(line)
-
-    NTC = calculate_temp_NTC(data["NTC"])
-    pressure = calculate_press(data["Press"])
-    height = calculate_height(pressure)
-    rpm = calculate_gyr(data["GyrZ"]) / 360 * 60
-
-    graph_data = {
-        "Time": data["Time"],
-        "NTC": NTC,
-        "Pressure": pressure,
-        "Height": height,
-        "Gyroscope": rpm
-    }
-
-    pprint(data)
-
-    return graph_data
 
 
 def post_data(data):
