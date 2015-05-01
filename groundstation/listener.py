@@ -7,6 +7,12 @@
 # done), received characters are displayed as is (or escaped trough pythons
 # repr, useful for debug purposes)
 
+"""
+Sets up an interactable terminal to the radio-module via a serial interface.
+Also saves received lines to a log file and
+communicates via a communication file with the feeder.
+"""
+
 import sys
 import os
 
@@ -14,8 +20,6 @@ import serial
 import threading
 
 import termios
-
-import time
 
 from .config import miniterm_get_log_file, COM_FILE
 from .utilities import discover_serial_port
@@ -46,6 +50,9 @@ PARITY = "N"
 
 
 def character(b):
+    """
+    Returns the decoded character ``b``.
+    """
     return b.decode('latin1')
 
 CRLF = serial.to_bytes([13, 10])
@@ -55,11 +62,18 @@ X0E = serial.to_bytes([0x0e])
 
 
 class Console(object):
+    """
+    The ``Console`` class is an abstraction upon the console interface.
+    Handles setting up and tearing down the console interface.
+    """
     def __init__(self):
         self.fd = sys.stdin.fileno()
         self.old = None
 
     def setup(self):
+        """
+        Sets up the console interface.
+        """
         self.old = termios.tcgetattr(self.fd)
         new = termios.tcgetattr(self.fd)
         new[3] = new[3] & ~termios.ICANON & ~termios.ECHO & ~termios.ISIG
@@ -68,10 +82,16 @@ class Console(object):
         termios.tcsetattr(self.fd, termios.TCSANOW, new)
 
     def getkey(self):
+        """
+        Read a single character from the console.
+        """
         c = os.read(self.fd, 1)
         return c
 
     def cleanup(self):
+        """
+        Clean up the console.
+        """
         if self.old is not None:
             termios.tcsetattr(self.fd, termios.TCSAFLUSH, self.old)
 
@@ -81,6 +101,10 @@ sys.exitfunc = console.cleanup  # terminal modes have to be restored on exit...
 
 
 class Miniterm(object):
+    """
+    The ``Miniterm`` class defines the structure of the terminal interface,
+    in charge of sending and receiving data.
+    """
     def __init__(self, port, baudrate, parity, rtscts, xonxoff, echo=False):
         self.serial = serial.serial_for_url(port, baudrate, parity=parity,
                                             rtscts=rtscts, xonxoff=xonxoff,
@@ -93,7 +117,9 @@ class Miniterm(object):
         self.break_state = False
 
     def _start_reader(self):
-        """Start reader thread"""
+        """
+        Start reader thread.
+        """
         self._reader_alive = True
         # start serial->console thread
         self.receiver_thread = threading.Thread(target=self.reader)
@@ -101,11 +127,16 @@ class Miniterm(object):
         self.receiver_thread.start()
 
     def _stop_reader(self):
-        """Stop reader thread only, wait for clean exit of thread"""
+        """
+        Stop reader thread only, wait for clean exit of thread.
+        """
         self._reader_alive = False
         self.receiver_thread.join()
 
     def start(self):
+        """
+        Starts the terminal.
+        """
         self.alive = True
         self._start_reader()
         # enter console->serial loop
@@ -114,15 +145,23 @@ class Miniterm(object):
         self.transmitter_thread.start()
 
     def stop(self):
+        """
+        Stops the terminal.
+        """
         self.alive = False
 
     def join(self, transmit_only=False):
+        """
+        Joins the terminal, blocking with the subthreads of the terminal.
+        """
         self.transmitter_thread.join()
         if not transmit_only:
             self.receiver_thread.join()
 
     def reader(self):
-        """loop and copy serial->console"""
+        """
+        Loop and copy serial->console.
+        """
         try:
             while self.alive and self._reader_alive:
                 data = character(self.serial.read(1))
@@ -145,7 +184,7 @@ class Miniterm(object):
             raise
 
     def writer(self):
-        """\
+        """
         Loop and copy console->serial until EXITCHARCTER character is
         found. When MENUCHARACTER is found, interpret the next key
         locally.
@@ -178,6 +217,9 @@ class Miniterm(object):
 
 
 def main():
+    """
+    Sets up a terminal and runs it.
+    """
     try:
         miniterm = Miniterm(PORT, BAUDRATE, PARITY, rtscts=RTSCTS,
                             xonxoff=XONXOFF, echo=ECHO)

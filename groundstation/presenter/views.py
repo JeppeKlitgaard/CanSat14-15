@@ -1,3 +1,7 @@
+"""
+Contains the views and routes used by the Flask-webserver.
+"""
+
 from flask import render_template, send_from_directory, abort
 from . import app
 import os
@@ -45,12 +49,18 @@ def dropdown_processor():
     available to all templates.
     """
     def get_dropdown_data():
+        """
+        Returns dropdown data.
+        """
         return data_config
     return dict(get_dropdown_data=get_dropdown_data)
 
 
 @app.route("/favicon.ico")
 def favicon():
+    """
+    Route in charge of finding the favicon.ico.
+    """
     return send_from_directory(os.path.join(app.root_path, 'static', 'img'),
                                'favicon.ico',
                                mimetype='image/vnd.microsoft.icon')
@@ -58,22 +68,34 @@ def favicon():
 
 @app.route("/about")
 def about():
+    """
+    Renders the about page.
+    """
     return render_template("about.html")
 
 
 @app.route("/")
 @app.route("/index")
 def index():
+    """
+    Renders the index page.
+    """
     return render_template("index.html")
 
 
 @app.route("/live")
 def live():
+    """
+    Renders the live page.
+    """
     return render_template("live.html")
 
 
 @app.route("/graph/<data_id>")
 def graph(data_id):
+    """
+    Renders the graph page using a ``data_id``.
+    """
     try:
         with open(_get_data_file(data_id), "r") as f:
             data_conf = _get_data_config(data_id)
@@ -114,4 +136,7 @@ def graph(data_id):
 
 @app.route("/replay/<data_id>")
 def replay(data_id):
+    """
+    Renders the replay page using a ``data_id``.
+    """
     return render_template("replay.html", data_id=data_id)

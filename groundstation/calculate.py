@@ -1,3 +1,8 @@
+"""
+Contains the functions and classes used to calculate and/or convert
+values read from the sensors.
+"""
+
 import math
 from .config import CALCULATE
 
@@ -8,13 +13,16 @@ PRESS_GROUND = 100
 
 def calculate_temp_LM35(raw_val):
     """
+    Converts the raw value read from the LM35 temperature sensor
+    module into degrees celsius.
     """
     return (500 / 1023) * raw_val
 
 
 def calculate_temp_NTC(raw_val):
     """
-    raw_val = a
+    Converts the raw value read from the NTC temperature sensor
+    module into degrees celsius.
     """
     voltage = raw_val * 5 / 1023
 
@@ -29,12 +37,17 @@ def calculate_temp_NTC(raw_val):
 
 
 def calculate_press(raw_val):
+    """
+    Converts the raw value read from the pressure sensor module
+    into kilopascal.
+    """
     return ((100 / 921) * raw_val) + 10
 
 
 def calculate_height(press_air):
     """
-    :type temp: an integer with the temperature at ground level in celsius
+    Calculates the height based on the pressure, pressure at ground level,
+    and temperature at ground level.
     """
     temp = TEMP_GROUND + 273.15  # Convert to kelvin
 
@@ -48,20 +61,35 @@ def calculate_height(press_air):
 
 
 def calculate_acc_x(raw_val):
+    """
+    Converts the raw value read from the accelleration sensor module,
+    taking calibration into consideration.
+    """
     return 0.0072339 * raw_val + 0.45212
 
 
 def calculate_acc_y(raw_val):
+    """
+    Converts the raw value read from the accelleration sensor module,
+    taking calibration into consideration.
+    """
     return 0.0072472 * raw_val - 0.39860
 
 
 def calculate_acc_z(raw_val):
+    """
+    Converts the raw value read from the accelleration sensor module,
+    taking calibration into consideration.
+    """
     return 0.0071289 * raw_val + 0.62377
 
 
 def calculate_gyr(raw_val):
     """
-    :rtype: integer, degrees per second.
+    Converts the raw value read from the gyroscope, taking calibration
+    into consideration.
+
+    Returns the rotational speed in degrees per second.
     """
     s = CALCULATE["gyro"]["sensitivity"]
     c = CALCULATE["gyro"]["calibration_factor"]
@@ -69,5 +97,9 @@ def calculate_gyr(raw_val):
 
 
 def calculate_mag(raw_val):
+    """
+    Converts the raw value read from the magnetometer.
+    Currently does not take calibration into consideration.
+    """
     result = raw_val * 2 / ((2**15) - 1)
     return result

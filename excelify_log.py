@@ -2,12 +2,11 @@ import argparse
 import os
 import sys
 import csv
-from collections import defaultdict, deque
+from collections import deque
 from listener.parse import validate_line, parse_line
 from listener.exceptions import MalformedPacket, ParseError
 from listener.calculate import (calculate_temp_NTC, calculate_temp_LM35,
-                                calculate_press, calculate_height,
-                                calculate_gyr,
+                                calculate_press, calculate_gyr,
                                 calculate_acc_x, calculate_acc_y,
                                 calculate_acc_z, calculate_mag)
 from listener.config import MIN_TIME, MAX_TIME, PRESSURE_AVERAGE_AMOUNT

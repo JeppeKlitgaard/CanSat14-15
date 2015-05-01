@@ -1,3 +1,7 @@
+"""
+Runs the Flask-based webserver.
+"""
+
 from .config import PRESENTER
 from .presenter import app
 

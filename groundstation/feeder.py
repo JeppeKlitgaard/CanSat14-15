@@ -1,8 +1,13 @@
+"""
+Contains a tornado-based WebSocket server in charge of supplying
+connected clients with live or replay data.
+"""
+
+
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
 
-import functools
 from collections import deque
 
 from pprint import pprint
@@ -11,9 +16,8 @@ import json
 
 from .config import COM_FILE
 from .parse import validate_line, parse_line
-from .exceptions import MalformedPacket, ParseError
-from .calculate import (calculate_temp_NTC, calculate_temp_LM35,
-                        calculate_press, calculate_height,
+from .exceptions import MalformedPacket
+from .calculate import (calculate_temp_NTC, calculate_press, calculate_height,
                         calculate_gyr)
 
 PORT = 8081
@@ -51,6 +55,7 @@ class DataWebSocket(tornado.websocket.WebSocketHandler):
 def broadcast(message):
     for client in clients:
         client.write_message(message)
+
 
 line_buf = ""
 

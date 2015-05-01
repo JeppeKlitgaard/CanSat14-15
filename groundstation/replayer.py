@@ -61,9 +61,9 @@ class Replayer(object):
 
 
 if __name__ == '__main__':
+    desc = "Replay a CanSat log file for listener."
     parser = argparse.ArgumentParser(prog="Replayer",
-                                     description="Replay a CanSat log file for "
-                                                  "listener.")
+                                     description=desc)
 
     parser.add_argument("input_file")
 

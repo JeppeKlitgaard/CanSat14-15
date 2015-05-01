@@ -1,3 +1,7 @@
+"""
+Contains the configuration parameters used by the groundstation module.
+"""
+
 BIND_ADDRESS = "0.0.0.0"
 
 PRESENTER = {

@@ -1,3 +1,9 @@
+"""
+Generates fake data.
+Used to test the rest of the groundstation module when no CanSat data is
+available.
+"""
+
 import time
 import random
 from .parse import HEAD, HEAD_SEP, DATA_SEP, FIELD_SEP
@@ -29,10 +35,18 @@ class Faker(object):
         self.start_time = time.time()
 
     def start(self):
+        """
+        Starts the faker.
+        """
         while True:
             self.write()
 
     def _gen_fake_line(self):
+        """
+        Generates a single, fake line.
+        Has a chance of writing a malformed line, depending on the
+        ``malformed_line_chance`` attribute.
+        """
         if random.random() < self.malformed_line_chance:
             return "I am a malformed packet, yadaaa!\n"
 
@@ -54,6 +68,10 @@ class Faker(object):
         return line
 
     def write(self):
+        """
+        Writes a single line of fake data, blocking the appropriate amount of
+        time.
+        """
         now = time.time()
         if now < self.last_data_read_time + self.data_interval:
             time.sleep((self.last_data_read_time + self.data_interval) - now)

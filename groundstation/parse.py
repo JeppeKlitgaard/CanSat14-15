@@ -1,3 +1,8 @@
+"""
+Contains functions and classes used to parse, handle, validate and interpret
+data received from the CanSat (or Faker).
+"""
+
 from .exceptions import ParseError, MalformedPacket, InvalidLine
 from .calculate import (calculate_temp_NTC, calculate_press, calculate_height,
                         calculate_gyr)
@@ -16,15 +21,24 @@ VALID_PATTERN = re.compile(r"SGCanScience>(\w+:[-.0-9]+\|?)+")
 
 
 def validate_line(line):
+    """
+    Validates ``line``.
+    """
     if not VALID_PATTERN.match(line):
         raise MalformedPacket("Got malformed packet: {}".format(line))
 
 
 def handle_key(key):
+    """
+    Handles ``key``.
+    """
     return key
 
 
 def handle_value(value):
+    """
+    Handles ``value`` by stripping new lines and converting to a float value.
+    """
     value = value.replace("\n", "")
     value = float(value)
 
@@ -32,7 +46,7 @@ def handle_value(value):
 
 
 def parse_line(line):
-    """Parses a line of output from the Arduino."""
+    """Parses a line of output from the CanSat."""
     line = line.replace("\n", "")
 
     try:

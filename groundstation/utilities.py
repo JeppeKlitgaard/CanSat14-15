@@ -1,3 +1,8 @@
+"""
+Contains various utility functions and classes used by the groundstation
+module.
+"""
+
 import os
 import time
 
@@ -17,8 +22,11 @@ def discover_serial_port():
     raise OSError("Unable to find serial port.")
 
 
-def convert_time(time):
-    return time / 1000
+def convert_time(time_ms):
+    """
+    Converts a time in milliseconds to a time in seconds.
+    """
+    return time_ms / 1000
 
 
 def average(iterable):
@@ -29,4 +37,7 @@ def average(iterable):
 
 
 def miniterm_get_log_file():
+    """
+    Returns a filename for a CanSat log file.
+    """
     return "cansat_{}.log".format(str(int(time.time())))
