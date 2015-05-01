@@ -16,8 +16,10 @@ import json
 from .config import GENERAL, FEEDER, BIND_ADDRESS
 from .parse import easy_parse_line
 from .exceptions import InvalidLine
+from .utilities import Buffer
 
 com_handle = open(GENERAL["com_file"], "r")
+line_buffer = Buffer(com_handle)
 
 clients = []
 
@@ -33,6 +35,9 @@ class BaseWebSocket(tornado.websocket.WebSocketHandler):
 
 
 class LiveDataWebSocket(BaseWebSocket):
+    """
+    Serves clients connected to the live endpoint with live data.
+    """
     def open(self):
         clients.append(self)
         print("A client has opened a connection.")
@@ -48,24 +53,22 @@ class LiveDataWebSocket(BaseWebSocket):
         print("[WARNNING] Got message: {}".format(message))
 
 
+class ReplayWebSocket(BaseWebSocket):
+    """
+    Serves clients connected to the replay endpoint.
+    """
+
+
 def broadcast(message):
     for client in clients:
         client.write_message(message)
 
 
-line_buf = ""
-
-
 def get_data():
-    line = com_handle.readline()
+    line = line_buffer.get_line()
 
-    if "\n" not in line:
-        line_buf += line
+    if not line:
         return
-    else:
-        line = line_buf + line
-        global line_buf
-        line_buf = ""
 
     try:
         data = easy_parse_line(line)
@@ -85,7 +88,10 @@ def post_data(data):
     broadcast(json_data)
 
 
-app = tornado.web.Application([(r"/live", LiveDataWebSocket)])
+app = tornado.web.Application([
+    (r"/live", LiveDataWebSocket)
+    (r"/replay", ReplayWebSocket)
+])
 
 
 if __name__ == '__main__':

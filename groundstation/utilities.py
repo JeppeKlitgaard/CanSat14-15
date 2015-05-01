@@ -41,3 +41,28 @@ def listener_get_log_file():
     Returns a filename for a CanSat log file.
     """
     return "cansat_{}.log".format(str(int(time.time())))
+
+
+class Buffer(object):
+    """
+    Acts as a buffer on a ``FileObject``.
+
+    ``get_line`` can be used to get full lines of data.
+    """
+    def __init__(self, handle):
+        self.handle = handle
+        self.line_buf = ""
+
+    def get_line(self):
+        """
+        Returns a string with a line of data.
+        Returns ``None`` if insufficient data available.
+        """
+        self.line_buf += self.handle.readline()
+
+        if "\n" in self.line_buf:
+            result = self.line_buf
+            self.line_buf = ""
+            return result
+        else:
+            return
