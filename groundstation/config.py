@@ -24,7 +24,7 @@ FEEDER = {
 }
 
 GENERAL = {
-    "com_file": "listener_com.log",
+    "com_file": "com_file",
     "data_base_path": "data",
     "data_config": "data_config.json"
 }
