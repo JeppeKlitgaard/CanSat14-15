@@ -21,12 +21,12 @@ import threading
 
 import termios
 
-from .config import miniterm_get_log_file, COM_FILE
-from .utilities import discover_serial_port
+from .config import COM_FILE
+from .utilities import discover_serial_port, listener_get_log_file
 
 
 # LOG
-LOG_FILE = miniterm_get_log_file()
+LOG_FILE = listener_get_log_file()
 log_handle = open(LOG_FILE, "w")
 
 # Communication file

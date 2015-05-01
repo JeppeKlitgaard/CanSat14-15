@@ -36,7 +36,7 @@ def average(iterable):
     return sum(iterable) / len(iterable)
 
 
-def miniterm_get_log_file():
+def listener_get_log_file():
     """
     Returns a filename for a CanSat log file.
     """
