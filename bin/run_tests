@@ -1,0 +1,3 @@
+#!/bin/bash
+flake8 groundstation excelify_log.py process_raw_log.py
+pylint groundstation
