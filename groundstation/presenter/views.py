@@ -3,6 +3,7 @@ from . import app
 import os
 from ..config import GENERAL
 from ..parse import easy_parse_line
+from ..utilities import convert_time
 import json
 
 data_config_path = os.path.abspath(os.path.join(GENERAL["data_base_path"],
@@ -75,6 +76,8 @@ def live():
 def graph(data_id):
     try:
         with open(_get_data_file(data_id), "r") as f:
+            data_conf = _get_data_config(data_id)
+
             data_temp = []
             data_press = []
             data_height = []
@@ -82,10 +85,13 @@ def graph(data_id):
 
             for line in f:
                 values = easy_parse_line(line)
-                data_temp.append([values["Time"], values["NTC"]])
-                data_press.append([values["Time"], values["Pressure"]])
-                data_height.append([values["Time"], values["Height"]])
-                data_gyro.append([values["Time"], values["Gyroscope"]])
+
+                time = convert_time(values["Time"] - data_conf["start_time"])
+
+                data_temp.append([time, values["NTC"]])
+                data_press.append([time, values["Pressure"]])
+                data_height.append([time, values["Height"]])
+                data_gyro.append([time, values["Gyroscope"]])
 
     except FileNotFoundError:
         abort(404)
