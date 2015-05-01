@@ -3,7 +3,6 @@ Contains a tornado-based WebSocket server in charge of supplying
 connected clients with live or replay data.
 """
 
-
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
