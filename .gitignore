@@ -79,3 +79,4 @@ sftp-config.json
 # ### Can Science ###
 *.csv
 images
+to_be_handled
