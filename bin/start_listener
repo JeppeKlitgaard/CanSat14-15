@@ -1,1 +1,1 @@
-python -m listener.miniterm
+python -m groundstation.listener
