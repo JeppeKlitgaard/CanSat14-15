@@ -16,8 +16,6 @@ import json
 from .config import GENERAL, FEEDER, BIND_ADDRESS
 from .parse import easy_parse_line
 from .exceptions import InvalidLine
-from .calculate import (calculate_temp_NTC, calculate_press, calculate_height,
-                        calculate_gyr)
 
 com_handle = open(GENERAL["com_file"], "r")
 
@@ -73,6 +71,8 @@ def get_data():
         data = easy_parse_line(line)
     except InvalidLine:
         return
+
+    pprint(data)
 
     post_data(data)
 
