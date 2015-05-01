@@ -11,13 +11,26 @@ with open(data_config_path, "r") as f:
     data_config = json.load(f)
 
 
-def _get_data_file(data_id):
+def _get_data_config(data_id):
+    """
+    Returns the dictionary associated with ``data_id``.
+    """
     matches_type = [data for data in data_config if isinstance(data, dict)]
     matches = [data for data in matches_type if data["id"] == data_id]
 
+    return matches[0]
+
+
+def _get_data_file(data_id):
+    """
+    Returns a ``str`` with the absolute path to the data-file associated
+    with ``data_id``.
+    """
+    data_conf = _get_data_config(data_id)
+
     try:
         file_ = os.path.abspath(os.path.join(GENERAL["data_base_path"],
-                                             matches[0]["file"]))
+                                             data_conf["file"]))
     except IndexError:
         abort(404)
 
