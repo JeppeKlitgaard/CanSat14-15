@@ -73,6 +73,7 @@ def graph(data_id):
                 data_press.append([values["Time"], values["Pressure"]])
                 data_height.append([values["Time"], values["Height"]])
                 data_gyro.append([values["Time"], values["Gyroscope"]])
+
     except FileNotFoundError:
         abort(404)
 
