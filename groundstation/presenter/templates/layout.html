@@ -5,6 +5,7 @@
 {% block styles %}
 {{super()}}
 <link rel="stylesheet" href="{{url_for('static', filename='css/graph.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/layout.css')}}">
 {% endblock %}
 
 {% block scripts %}
@@ -69,4 +70,15 @@
 {% endblock %}
 
 {% block content %}
+{% endblock %}
+
+{% block body %}
+{{super()}}
+
+<footer class="footer">
+    <div class="container">
+        <p class="text-muted">This page is homemade and contains lots of love.</p>
+    </div>
+</footer>
+
 {% endblock %}
