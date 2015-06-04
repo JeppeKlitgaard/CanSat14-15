@@ -15,7 +15,7 @@ By: SG CanSat 14/15
 #define LSM9DS0_G   0x6B // Would be 0x6A if SDO_G is LOW
 LSM9DS0 dof(MODE_I2C, LSM9DS0_G, LSM9DS0_XM);
 #define TERMBAUD  19200
-#define GPSBAUD 4800
+#define GPSBAUD 38400
 
 TinyGPS gps;
 
