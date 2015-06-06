@@ -71,7 +71,7 @@ def about():
     """
     Renders the about page.
     """
-    return render_template("about.html")
+    return render_template("about.html", page_title="About")
 
 
 @app.route("/")
@@ -88,7 +88,8 @@ def live():
     """
     Renders the live page.
     """
-    return render_template("live.html", replay_available=False)
+    return render_template("live.html", replay_available=False,
+                           page_title="Live")
 
 
 @app.route("/graph/<data_id>")
@@ -132,7 +133,7 @@ def graph(data_id):
     json_data = json.dumps(data, separators=(",", ":"))
 
     return render_template("graph.html", graph_data=json_data, data_id=data_id,
-                           replay_available=True)
+                           replay_available=True, page_title="Graph")
 
 
 @app.route("/replay/<data_id>")
@@ -140,4 +141,4 @@ def replay(data_id):
     """
     Renders the replay page using a ``data_id``.
     """
-    return render_template("replay.html", data_id=data_id)
+    return render_template("replay.html", data_id=data_id, page_title="Replay")

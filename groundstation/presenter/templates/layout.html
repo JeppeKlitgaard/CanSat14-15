@@ -13,7 +13,7 @@
 <script src="{{url_for('static', filename='js/highcharts.js')}}"></script>
 {% endblock %}
 
-{% block title %}SG - Live data presenter - SG Cansat{% endblock %}
+{% block title %}{% if page_title %} {{page_title}} - {% endif %} SG Can Science{% endblock %}
 
 {% block navbar %}
 <nav class="navbar navbar-default">
