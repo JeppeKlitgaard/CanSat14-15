@@ -2,9 +2,11 @@
 
 {% block content %}
 
+{% if replay_available %}
 <div id="replay-btn" class="text-center control-group margin-bot-5">
     <a class="btn btn-info" href="/replay/{{data_id}}">Replay data!</a>
 </div>
+{% endif %}
 
 <div id="graph-container">
     <div class="row">
