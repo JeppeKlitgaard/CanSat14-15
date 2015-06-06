@@ -7,3 +7,15 @@
 .container .text-muted {
     margin: 20px 0;
 }
+
+.spacer-10 {
+    margin-top: 10px;
+}
+
+.spacer-25 {
+    margin-top: 25px;
+}
+
+.spacer-50 {
+    margin-top: 50px;
+}
