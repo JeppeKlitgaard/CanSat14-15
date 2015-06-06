@@ -8,6 +8,8 @@ from .calculate import (calculate_temp_NTC, calculate_press, calculate_height,
                         calculate_gyr)
 from .config import EXAMPLE_DATA_CONFIG
 
+from copy import copy
+
 import re
 
 HEAD = "SGCanScience"
@@ -52,6 +54,9 @@ def parse_line(line):
 
     try:
         head, data_string = line.split(HEAD_SEP)
+        if head != HEAD:
+            raise ParseError("Got a wrong head.")
+
     except ValueError:
         raise ParseError("Wrong amount of HEAD_SEP's.")
 
@@ -79,12 +84,16 @@ def parse_line(line):
     return data
 
 
-def easy_parse_line(line, data_config=EXAMPLE_DATA_CONFIG, verbose=True):
+def easy_parse_line(line, data_config=None, verbose=True):
     """
     Parse data with a one-liner!
 
     Raises InvalidLine if ``line`` is not valid.
     """
+
+    if data_config is None:
+        data_config = copy(EXAMPLE_DATA_CONFIG)
+
     try:
         validate_line(line)
     except MalformedPacket:

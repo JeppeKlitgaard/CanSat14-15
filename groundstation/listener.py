@@ -175,7 +175,7 @@ class Miniterm(object):
                 sys.stdout.flush()
                 log_handle.flush()
                 com_handle.flush()
-        except serial.SerialException as e:
+        except serial.SerialException:
             self.alive = False
             # would be nice if the console reader could be interruptted at this
             # point...

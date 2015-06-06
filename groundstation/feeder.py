@@ -39,6 +39,9 @@ class LiveDataWebSocket(BaseWebSocket):
     Serves clients connected to the live endpoint with live data.
     """
     def open(self):
+        """
+        Called when a client opens the connection.
+        """
         clients.append(self)
         print("A client has opened a connection.")
 
@@ -46,10 +49,16 @@ class LiveDataWebSocket(BaseWebSocket):
             self.write_message(data_point)
 
     def on_close(self):
+        """
+        Called when a client closes the connection.
+        """
         clients.remove(self)
         print("A client closed its connection.")
 
     def on_message(self, message):
+        """
+        Called when a client sends a message.
+        """
         print("[WARNNING] Got message: {}".format(message))
 
 
@@ -60,11 +69,17 @@ class ReplayWebSocket(BaseWebSocket):
 
 
 def broadcast(message):
+    """
+    Broadcasts a message to all the connected clients.
+    """
     for client in clients:
         client.write_message(message)
 
 
 def get_data():
+    """
+    Called by the ioloop to get data from the listener.
+    """
     line = line_buffer.get_line()
 
     if not line:
@@ -83,13 +98,18 @@ def get_data():
 
 
 def post_data(data):
+    """
+    Called by ``get_data``.
+
+    Sends ``data`` to the connected clients.
+    """
     json_data = json.dumps(data)
 
     broadcast(json_data)
 
 
 app = tornado.web.Application([
-    (r"/live", LiveDataWebSocket)
+    (r"/live", LiveDataWebSocket),
     (r"/replay", ReplayWebSocket)
 ])
 

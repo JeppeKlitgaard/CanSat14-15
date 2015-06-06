@@ -39,7 +39,7 @@ for line in input_handle:
             print("Skipped line due to time.")
         continue
 
-    if args.end_time != -1 and data["Time"] > end_time:
+    if args.end_time != -1 and data["Time"] > args.end_time:
         if args.verbose:
             print("Skipped line due to time.")
         continue
