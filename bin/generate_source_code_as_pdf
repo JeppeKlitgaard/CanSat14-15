@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILES=`find ./ -name "*.py" -o -name "*.css" -o -name "*.html" -o -name "*.ino" -o -name "*.json"`
+FILES=`find ./ -type f -name "*.py" -o -name "*.css" -o -name "*.html" -o -name "*.ino" -o -name "*.json" -o -path '*/libraries' -prune`
 FILES="$FILES bin/* groundstation/presenter/static/js/graph.js  requirements.txt dev_requirements.txt"
 FILES="$FILES"
 enscript -E --color -q -Z -f Courier10 -G --page-label-format=long --toc $FILES system_config/network-manager/SG\ Can\ Science -o - |ps2pdf - source_code.pdf 
