@@ -3,7 +3,7 @@ Contains the views and routes used by the Flask-webserver.
 """
 
 from flask import render_template, send_from_directory, abort
-from . import app
+from .app import app
 import os
 from ..config import GENERAL
 from ..parse import easy_parse_line
