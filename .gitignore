@@ -80,6 +80,6 @@ sftp-config.json
 *.csv
 *.db
 images
-to_be_handled
+note_til_cansat_holdet.txt
 com_file
 secret_config.py
