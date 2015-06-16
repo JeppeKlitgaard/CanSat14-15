@@ -1,9 +1,10 @@
 pyserial
 flask
 flask_bootstrap
+flask_debugtoolbar
 peewee
 pygments
 markdown
 micawber
-BeautifulSoup
+beautifulsoup4
 tornado
