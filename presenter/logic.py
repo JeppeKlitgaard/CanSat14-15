@@ -1,3 +1,7 @@
+"""
+Contains the logic used by the presenter module.
+"""
+
 import json
 import os
 
@@ -9,6 +13,9 @@ from flask import abort
 
 
 def get_global_data_config():
+    """
+    Returns the data configuration as a python object.
+    """
     data_config_path = os.path.abspath(os.path.join(DATA_BASE_PATH,
                                                     DATA_CONFIG_FILE))
 
@@ -46,6 +53,10 @@ def _get_data_config(data_id):
 
 
 def get_static_graph_data(data_id):
+    """
+    Returns a jsonified string of data to be sent along with a Response to a
+    client connected to the static graph endpoint.
+    """
     try:
         with open(_get_data_file(data_id), "r") as f:
             data_conf = _get_data_config(data_id)

@@ -1,3 +1,10 @@
+"""
+This module instantiates the flask application and
+applies the configuration file as well as the extensions.
+
+It also sets up the database and the OEmbed cache.
+"""
+
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_debugtoolbar import DebugToolbarExtension
@@ -22,5 +29,3 @@ flask_db = FlaskDB(app)
 database = flask_db.database
 
 oembed_providers = bootstrap_basic(OEmbedCache)
-
-from . import views

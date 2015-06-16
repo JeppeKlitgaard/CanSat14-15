@@ -17,14 +17,25 @@ from .models import Entry
 from .logic import get_static_graph_data, get_global_data_config
 
 
+# pylint: disable=unused-argument
 @app.errorhandler(404)
 def not_found(exc):
+    """
+    Called when a resource could not be found - a 404 has been raised.
+    """
     return Response("<h3>Not found</h3>"), 404
+# pylint: enable=unused-argument
 
 
 def login_required(fn):
+    """
+    A decorator to be used on routes that require the user to be logged in.
+    """
     @functools.wraps(fn)
     def inner(*args, **kwargs):
+        """
+        The inner function of the decorator.
+        """
         if session.get("logged_in"):
             return fn(*args, **kwargs)
         return redirect(url_for("login", next=request.path))
@@ -57,6 +68,9 @@ def favicon():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    """
+    Route for logging in.
+    """
     next_url = request.args.get("next") or request.form.get("next")
 
     if request.method == "POST" and request.form.get("password"):
@@ -74,6 +88,9 @@ def login():
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
+    """
+    Route for logging out.
+    """
     if request.method == "POST":
         session.clear()
         return redirect(url_for("login"))
@@ -129,6 +146,9 @@ def replay(data_id):
 @app.route("/blog/")
 @app.route("/blog/index")
 def blog_index():
+    """
+    Renders the index of the blog.
+    """
     query = Entry.public().order_by(Entry.timestamp.desc())
 
     return object_list("blog_index.html", query, check_bounds=False,
@@ -138,12 +158,17 @@ def blog_index():
 @app.route("/blog/create", methods=["GET", "POST"])
 @login_required
 def blog_create():
+    """
+    Renders the 'create an entry' page for the blog.
+    """
     if request.method == "POST":
         if request.form.get("title") and request.form.get("content"):
+            # pylint: disable=no-member
             entry = Entry.create(
                 title=request.form["title"],
                 content=request.form["content"],
                 published=request.form.get("published") or False)
+            # pylint: enable=no-member
             flash("Entry created successfully.", "success")
             if entry.published:
                 return redirect(url_for("blog_detail", slug=entry.slug))
@@ -157,6 +182,9 @@ def blog_create():
 @app.route("/blog/drafts")
 @login_required
 def blog_drafts():
+    """
+    Renders a page with entry drafts.
+    """
     query = Entry.draft().order_by(Entry.timestamp.desc())
 
     return object_list("blog_index.html", query, check_bounds=False,
@@ -166,8 +194,13 @@ def blog_drafts():
 @app.route("/blog/detail/<slug>")
 @app.route("/blog/<slug>")
 def blog_detail(slug):
+    """
+    Renders a blog entry.
+    """
     if session.get("logged_in"):
+        # pylint: disable=no-member
         query = Entry.select()
+        # pylint: enable=no-member
     else:
         query = Entry.public()
     entry = get_object_or_404(query, Entry.slug == slug)
@@ -178,6 +211,9 @@ def blog_detail(slug):
 @app.route("/blog/<slug>/edit", methods=["GET", "POST"])
 @login_required
 def blog_edit(slug):
+    """
+    Renders the edit page of a blog entry.
+    """
     entry = get_object_or_404(Entry, Entry.slug == slug)
     if request.method == "POST":
         if request.form.get("title") and request.form.get("content"):

@@ -12,6 +12,13 @@ from .config import HOST, PORT
 
 
 def run():
+    """
+    Runs the presenter module.
+    """
+    # pylint: disable=unused-variable
+    from . import views  # noqa
+    # pylint: enable=unused-variable
+
     database.create_tables([Entry], safe=True)
 
     app.run(use_reloader=False, host=HOST, port=PORT)
