@@ -1,3 +1,3 @@
 #!/bin/bash
-flake8 groundstation excelify_log.py process_raw_log.py
-pylint groundstation
+flake8 groundstation listener presenter feeder excelify_log.py process_raw_log.py run_presenter.py
+pylint groundstation listener presenter feeder
