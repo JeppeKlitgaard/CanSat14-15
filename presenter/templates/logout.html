@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block content_title %}Log out{% endblock %}
+
+{% block content_inner %}
+  <p>Click the button below to log out of the site.</p>
+  <form action="{{ url_for('logout') }}" class="form-horizontal" method="post">
+    <button class="btn btn-primary" type="submit">Log out</button>
+  </form>
+{% endblock %}

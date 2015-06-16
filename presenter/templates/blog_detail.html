@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block content_title %}
+{{ entry.title }}
+{% if session.logged_in %}
+<a href="{{url_for('blog_edit', slug=entry.slug)}}"><small>Edit</small></a>
+{% endif %}
+{% endblock %}
+
+{% block extra_header %}
+  {% if session.logged_in %}
+    <li><a href="{{ url_for('edit', slug=entry.slug) }}">Edit entry</a></li>
+  {% endif %}
+{% endblock %}
+
+{% block content_inner %}
+  <p class="text-muted">Created {{ entry.timestamp.strftime('%m/%d/%Y at %G:%I%p') }}</p>
+  {{ entry.html_content }}
+{% endblock %}

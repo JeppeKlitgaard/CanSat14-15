@@ -78,6 +78,7 @@ sftp-config.json
 
 # ### Can Science ###
 *.csv
+*.db
 images
 to_be_handled
 com_file

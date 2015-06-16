@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block content_title %}Blog entries{% endblock %}
+
+{% block content_inner %}
+<div class="container">
+    {% for entry in object_list %}
+        <h3>
+            <a href="{% if entry.published %}{{ url_for('blog_detail', slug=entry.slug) }}{% else %}{{ url_for('blog_edit', slug=entry.slug) }}{% endif %}">
+                {{ entry.title }}
+            </a>
+        </h3>
+        <p>Created {{ entry.timestamp.strftime('%m/%d/%Y at %G:%I%p') }}</p>
+    {% else %}
+        <p>No entries have been created yet or there are no drafts.</p>
+    {% endfor %}
+</div>
+{% endblock %}
