@@ -1,36 +1,46 @@
-/*
-The Arduino C code that powers SG's 14/15 CanSat team's can.
 
-By: SG CanSat 14/15
-*/
-
-// Both 9degree (I2C) and 3 serial measurements
-
-#include <SPI.h> // Included for SFE_LSM9DS0 library
+#include <SPI.h>
+#include <SFE_BMP180.h>
 #include <Wire.h>
 #include <SFE_LSM9DS0.h>
-#include <TinyGPS.h>
+#include <TinyGPS++.h>
+
 
 #define LSM9DS0_XM  0x1D // Would be 0x1E if SDO_XM is LOW
 #define LSM9DS0_G   0x6B // Would be 0x6A if SDO_G is LOW
 LSM9DS0 dof(MODE_I2C, LSM9DS0_G, LSM9DS0_XM);
-#define TERMBAUD  19200
-#define GPSBAUD 38400
 
-TinyGPS gps;
+SFE_BMP180 pressure;
+TinyGPSPlus gps;
 
-void getgps(TinyGPS &gps);
+int cameraInterval = 20000; // ms
+unsigned long lastCameraTime;
+boolean cameraState = 0;
 
+int communicationPin = 7;
 
 void setup() {
-//  pinMode(16, OUTPUT);  // init LED
-//  pinMode(21, OUTPUT);  // init LED
-
-  //Serial.begin(19200);  // init Serial USB
-  Serial1.begin(TERMBAUD);  // init Serial Radio
-  Serial3.begin(GPSBAUD); // init GPS
+  Serial1.begin(19200);
+ 
+  //GPS Baud
+  Serial3.begin(9600);
   
-   // call it with declarations for sensor scales and data rates:
+  pinMode(communicationPin, OUTPUT); 
+  
+  if (pressure.begin()){
+  Serial1.println("BMP180 init success");
+  }
+  else
+  {
+    // Oops, something went wrong, this is usually a connection problem,
+    // see the comments at the top of this sketch for the proper connections.
+
+    Serial1.println("BMP180 init fail\n\n");
+    while(1); // Pause forever.
+  }
+  
+  
+  // call it with declarations for sensor scales and data rates:
   uint16_t status = dof.begin(dof.G_SCALE_2000DPS,
                               dof.A_SCALE_16G, dof.M_SCALE_2GS);
 
@@ -46,43 +56,36 @@ void setup() {
   Serial.println();
   
 }
-// The main loop, which sends the collected data via the Serial Radio to the ground station every 200 milliseconds
+
+// The main loop, which sends the collected data via the Serial Radio to the ground station every 100 milliseconds
 void loop() {
-
-  send_basics();    // Sends the collected data, which is read in the send_basics function
   
-  while(Serial3.available()) {
-    int c = Serial3.read();
-    gps.encode(c);
+  while (Serial3.available() > 0){
+    gps.encode(Serial3.read()); 
   }
-  getgps(gps);
   
+  if (millis() > lastCameraTime + cameraInterval) {
+    lastCameraTime = millis()
+    if (cameraState == 0) {
+      cameraState = 1;
+      digitalWrite(communicationPin, HIGH);
+    } else {
+      cameraState = 0;
+      digitalWrite(communicationPin, LOW);
+    }
+  }
+  send_basics(); // Sends the collected data, which is read in the send_basics function
+ /* 
+  if(Serial3.available()){
+    Serial.write(Serial3.read());
+  }
+ */
   Serial1.println(""); //Print new-line
-  delay(100);              // wait before sending next data-batch
+  delay(100); // wait before sending next data-batch
 
 }
 
-// The getgps function will get the gps data and send i to the send_data_field function
-void getgps(TinyGPS &gps) {
-  //Declares floats for latitude and longitude
-  float latitude;
-  float longitude;
-  //Latitude and longitude
-  gps.f_get_position(&latitude, &longitude);
-  
-  send_data_field_float("Lat", latitude, 5);
-  send_data_field_float("Long", longitude, 5);
-  //Altitude in meters
-  send_data_field_float("Alt", gps.f_altitude(), 2);
-  //Course in degrees
-  send_data_field_float("Cour", gps.f_course(), 2);
-  //Speed in kmph
-  send_data_field_float("Speed", gps.f_speed_kmph(), 5);
-  //Print number of satellites in view
-  send_data_field("Sat", String(gps.satellites()));
-}
-  
-void send_basics() {
+void send_basics(){
   // Declares the variables and reads the "9 degrees of freedom"-data
   //Gyr data
   dof.readGyro();
@@ -102,32 +105,24 @@ void send_basics() {
   int MagY = dof.my;
   int MagZ = dof.mz;
   
-  // Declares the variables used for storing the pressure, LM35, and NTC data
-  // Temp & pressure data
-  int Press; // the analog input0
-  int LM35; // the analog input1
-  int NTC; // the analog input2
-  // Reads the analog data from the corresponding sensor and assigns it to the variables declared above
-  Press = analogRead(A0); // reading the analog value port A0 Pressure
-  LM35 = analogRead(A1); // reading the analog value port A1  LM35
-  LM35 = analogRead(A1); // reading the analog value port A1  LM35 again. The first could be wrong
-  NTC = analogRead(A2); // reading the analog value port A2  NTC
-
-  //Sends all the read data via the send_data_field function
-  //Print identifier
+  //Declares the variable used for storing the NTC data
+  int NTC; //The analog input2
+  
+  //Reads the analog data from the corresponding sensor and assigns it to the variables declared above
+  NTC = analogRead(A2);
+  
+  // Sends all the read data via the send_data_field function
+  // Prints identifier
   Serial1.print("SGCanScience>");
-
+  
   //Print Time
   send_data_field("Time", String(millis()));
-
-  //Print Pressure
-  send_data_field("Press", String(Press));
-
-  //Print LM35
-  send_data_field("LM35", String(LM35));
-
+  
   //Print NTC
   send_data_field("NTC", String(NTC));
+  
+  //Print BMP 180 pressure and temperature
+  send_pressTemp();
   
   //Print Gyr
   send_data_field("GyrX", String(GyrX));
@@ -144,11 +139,57 @@ void send_basics() {
   send_data_field("MagY", String(MagY));
   send_data_field("MagZ", String(MagZ));
   
+  //GPS
+  //Print Latitude
+  send_data_field_float("Lat", gps.location.lat(), 6);
+  
+  //Print Longitude
+  send_data_field_float("Lng", gps.location.lng(), 6);
+  
+  //Print  Satellites
+  send_data_field("Sat", String(gps.satellites.value()));
+}
 
-  }
+void send_pressTemp() {
+  
+  char status;
+  double T,P;
+  status = pressure.startTemperature();
+  
+  if(status != 0) {
+    delay(status);
+    
+    status = pressure.getTemperature(T);
+      if (status != 0) {
+      
+      /*     
+      Serial.print("Temperature:");
+      Serial.print(T,2);
+      Serial.print("|");
+      */
+      send_data_field_float("Temp", T, 2);
+      
+      status = pressure.startPressure(3);
+    
+      if(status != 0) {
+        delay(status);
+        
+      
+        status = pressure.getPressure(P,T);
+        if (status != 0) {
+          /*
+          Serial.print("Pressure:");
+          Serial.print(P,2);
+          Serial.print("|");
+          */
+          send_data_field_float("Press", P, 2);
+                
+        }
+      }
+    }
+  }     
+}
 
-//The send_data_field function, which is called when sending data to the ground station
-//Is used for formatting the data so the ground station is able to break the data in to the correct "blocks"
 void send_data_field(String key, String value) {
   Serial1.print(key + ":" + value + "|");
 }

@@ -14,6 +14,8 @@ from micawber.cache import Cache as OEmbedCache
 
 from playhouse.flask_utils import FlaskDB
 
+from .models import Entry
+
 from . import config
 from . import secret_config
 
@@ -29,3 +31,5 @@ flask_db = FlaskDB(app)
 database = flask_db.database
 
 oembed_providers = bootstrap_basic(OEmbedCache)
+
+database.create_tables([Entry], safe=True)
