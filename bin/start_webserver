@@ -6,5 +6,5 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
-source /home/jeppe/.virtualenvs/CanSat14-15/bin/activate
+source $HOME/.virtualenvs/CanSat14-15/bin/activate
 python run_presenter.py
