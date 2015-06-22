@@ -14,8 +14,6 @@ from micawber.cache import Cache as OEmbedCache
 
 from playhouse.flask_utils import FlaskDB
 
-from .models import Entry
-
 from . import config
 from . import secret_config
 
@@ -29,6 +27,8 @@ DebugToolbarExtension(app)
 
 flask_db = FlaskDB(app)
 database = flask_db.database
+
+from .models import Entry
 
 oembed_providers = bootstrap_basic(OEmbedCache)
 
