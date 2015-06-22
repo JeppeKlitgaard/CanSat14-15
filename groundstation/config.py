@@ -4,10 +4,14 @@ Contains the configuration parameters used by the groundstation module.
 
 BIND_ADDRESS = "0.0.0.0"
 
+DATA_BASE_PATH = "data"
+DATA_CONFIG_FILE = "data_config.json"
+
 PRESENTER = {
     "port": 80,
     "address": BIND_ADDRESS,
     "debug": True,
+    "database": "sqliteext:///presenter.db"
 }
 
 FAKER = {
