@@ -28,8 +28,8 @@ DebugToolbarExtension(app)
 flask_db = FlaskDB(app)
 database = flask_db.database
 
-from .models import Entry
-
 oembed_providers = bootstrap_basic(OEmbedCache)
+
+from .models import Entry
 
 database.create_tables([Entry], safe=True)
