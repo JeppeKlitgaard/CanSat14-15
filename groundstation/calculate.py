@@ -11,14 +11,6 @@ TEMP_GROUND = 2
 PRESS_GROUND = 100
 
 
-def calculate_temp_LM35(raw_val):
-    """
-    Converts the raw value read from the LM35 temperature sensor
-    module into degrees celsius.
-    """
-    return (500 / 1023) * raw_val
-
-
 def calculate_temp_NTC(raw_val):
     """
     Converts the raw value read from the NTC temperature sensor
