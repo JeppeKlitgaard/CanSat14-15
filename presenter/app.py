@@ -14,13 +14,12 @@ from micawber.cache import Cache as OEmbedCache
 
 from playhouse.flask_utils import FlaskDB
 
-from . import config
 from . import secret_config
 
 app = Flask(__name__)
 
-app.config.from_object(config)
 app.config.from_object(secret_config)
+app.config["DATABASE"] = "sqliteext:///presenter.db"
 
 Bootstrap(app)
 DebugToolbarExtension(app)
