@@ -7,4 +7,4 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 source $HOME/.virtualenvs/CanSat14-15/bin/activate
-python run_presenter.py
+python run_presenter.py $1
