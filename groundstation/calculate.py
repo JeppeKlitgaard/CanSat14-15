@@ -33,7 +33,7 @@ def calculate_press(raw_val):
     Converts the raw value read from the pressure sensor module
     into kilopascal.
     """
-    return ((100 / 921) * raw_val) + 10
+    return raw_val / 10
 
 
 def calculate_height(air_press, ground_press, ground_temp):
