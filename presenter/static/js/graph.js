@@ -26,7 +26,7 @@ Highcharts.setOptions({
 });
 
 function createGraph(domIdent, dataIdent, title, xText, yText, seriesInitData) {
-    $(domIdent).highcharts('StockChart', $.extend({}, baseSettings, {
+    $(domIdent).highcharts('StockChart', $.extend(true, {}, baseSettings, {
         chart: {
             events: {
                 load: function() {
