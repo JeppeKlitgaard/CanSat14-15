@@ -18,7 +18,7 @@ DATA_SEP = "|"  # Separates data-points of datastring.
 FIELD_SEP = ":"  # Separates key and value in a data field.
 REQUIRED_FIELDS = ["Time", "Press", "NTC", "GyrX", "GyrY", "GyrZ",
                    "AccX", "AccY", "AccZ", "MagX", "MagY", "MagZ", "Lat",
-                   "Lng", "Sat"]
+                   "Long", "Sat"]
 
 VALID_PATTERN = re.compile(r"SGCanScience>(\w+:[-.0-9]+\|?)+")
 
