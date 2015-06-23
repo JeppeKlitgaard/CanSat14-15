@@ -22,12 +22,6 @@ FAKER = {
     "malformed_line_chance": 0.1  # decimal 1 = 100%
 }
 
-FEEDER = {
-    "cache_size": 100,
-    "port": 8081,
-    "frequency": 10  # ms
-}
-
 GENERAL = {
     "com_file": "com_file",
     "data_base_path": "data",
