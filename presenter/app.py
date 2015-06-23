@@ -7,7 +7,6 @@ It also sets up the database and the OEmbed cache.
 
 from flask import Flask
 from flask_bootstrap import Bootstrap
-from flask_debugtoolbar import DebugToolbarExtension
 
 from micawber import bootstrap_basic
 from micawber.cache import Cache as OEmbedCache
@@ -22,7 +21,6 @@ app.config.from_object(secret_config)
 app.config["DATABASE"] = "sqliteext:///presenter.db"
 
 Bootstrap(app)
-DebugToolbarExtension(app)
 
 flask_db = FlaskDB(app)
 database = flask_db.database
