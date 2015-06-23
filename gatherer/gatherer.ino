@@ -144,7 +144,7 @@ void send_basics(){
   send_data_field_float("Lat", gps.location.lat(), 6);
   
   //Print Longitude
-  send_data_field_float("Lng", gps.location.lng(), 6);
+  send_data_field_float("Long", gps.location.lng(), 6);
   
   //Print  Satellites
   send_data_field("Sat", String(gps.satellites.value()));
