@@ -5,6 +5,7 @@ Contains the logic used by the presenter module.
 import json
 import os
 
+from groundstation.exceptions import ParseError
 from groundstation.parse import easy_parse_line
 from groundstation.utilities import convert_time
 from groundstation.config import DATA_BASE_PATH, DATA_CONFIG_FILE
@@ -52,7 +53,7 @@ def _get_data_config(data_id):
     return matches[0]
 
 
-def get_static_graph_data(data_id):
+def get_static_graph_data(data_id, force=False):
     """
     Returns a jsonified string of data to be sent along with a Response to a
     client connected to the static graph endpoint.
@@ -67,14 +68,19 @@ def get_static_graph_data(data_id):
             data_gyro = []
 
             for line in f:
-                values = easy_parse_line(line, data_config=data_conf)
+                try:
+                    values = easy_parse_line(line, data_config=data_conf)
 
-                time = convert_time(values["Time"] - data_conf["start_time"])
+                    time = convert_time(values["Time"] - data_conf["start_time"])
 
-                data_temp.append([time, values["NTC"]])
-                data_press.append([time, values["Pressure"]])
-                data_height.append([time, values["Height"]])
-                data_gyro.append([time, values["Gyroscope"]])
+                    data_temp.append([time, values["NTC"]])
+                    data_press.append([time, values["Pressure"]])
+                    data_height.append([time, values["Height"]])
+                    data_gyro.append([time, values["Gyroscope"]])
+
+                except ParseError:
+                    if not force:
+                        raise
 
     except FileNotFoundError:
         abort(404)
