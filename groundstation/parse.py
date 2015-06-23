@@ -79,7 +79,8 @@ def parse_line(line):
 
     for required_field in REQUIRED_FIELDS:
         if required_field not in data.keys():
-            raise ParseError("A field went missing!")
+            raise ParseError(("A field '{}' went missing!"
+                              .format(required_field)))
 
     return data
 

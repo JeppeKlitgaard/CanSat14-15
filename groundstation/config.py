@@ -1,6 +1,7 @@
 """
 Contains the configuration parameters used by the groundstation module.
 """
+COM_FILE = "com_file"
 
 BIND_ADDRESS = "0.0.0.0"
 
