@@ -3,7 +3,14 @@ Contains the exceptions used by the groundstation module.
 """
 
 
-class ParseError(Exception):
+class GroundstationError(Exception):
+    """
+    General exception used as an ABC by the groundstation.
+    """
+    pass
+
+
+class ParseError(GroundstationError):
     """
     Exception raised when an error during parsing occurs.
     """
