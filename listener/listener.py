@@ -21,8 +21,8 @@ import threading
 
 import termios
 
-from .config import COM_FILE
-from .utilities import discover_serial_port, listener_get_log_file
+from groundstation.config import COM_FILE
+from groundstation.utilities import discover_serial_port, listener_get_log_file
 
 
 # LOG
