@@ -13,17 +13,19 @@ from pprint import pprint
 
 import json
 
-from .config import GENERAL, FEEDER, BIND_ADDRESS
-from .parse import easy_parse_line
-from .exceptions import InvalidLine
-from .utilities import Buffer
+from .config import CACHE_SIZE, PORT, FREQUENCY
 
-com_handle = open(GENERAL["com_file"], "r")
+from groundstation.config import COM_FILE, BIND_ADDRESS
+from groundstation.parse import easy_parse_line
+from groundstation.exceptions import InvalidLine
+from groundstation.utilities import Buffer
+
+com_handle = open(COM_FILE, "r")
 line_buffer = Buffer(com_handle)
 
 clients = []
 
-cache = deque(maxlen=FEEDER["cache_size"])
+cache = deque(maxlen=CACHE_SIZE)
 
 
 class BaseWebSocket(tornado.websocket.WebSocketHandler):
@@ -115,10 +117,10 @@ app = tornado.web.Application([
 
 
 if __name__ == '__main__':
-    app.listen(FEEDER["port"], BIND_ADDRESS)
+    app.listen(PORT, BIND_ADDRESS)
     loop = tornado.ioloop.IOLoop.instance()
 
-    getter = tornado.ioloop.PeriodicCallback(get_data, FEEDER["frequency"],
+    getter = tornado.ioloop.PeriodicCallback(get_data, FREQUENCY,
                                              io_loop=loop)
     getter.start()
     loop.start()
