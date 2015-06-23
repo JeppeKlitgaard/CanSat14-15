@@ -17,8 +17,7 @@ $(function () {
                 "Rounds per minute", []);
 });
 
-{% set host = "localhost" if config.DEBUG else "10.42.0.1" %}
-var socket = new WebSocket("ws://{{ host }}:8081/live");
+var socket = new WebSocket("ws://{{request.headers.host}}:8081/live");
 
 socket.onmessage = function(event){
     json_obj = JSON.parse(event.data);
