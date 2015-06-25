@@ -16,12 +16,12 @@ import json
 from .config import CACHE_SIZE, PORT, FREQUENCY
 
 from groundstation.config import COM_FILE, BIND_ADDRESS
-from groundstation.parse import easy_parse_line
+from groundstation.parse import parse_line
 from groundstation.exceptions import InvalidLine
 from groundstation.utilities import Buffer
 
 com_handle = open(COM_FILE, "r")
-line_buffer = Buffer(com_handle)
+buf = Buffer(com_handle)
 
 clients = []
 
@@ -82,13 +82,8 @@ def get_data():
     """
     Called by the ioloop to get data from the listener.
     """
-    line = line_buffer.get_line()
-
-    if not line:
-        return
-
     try:
-        data = easy_parse_line(line)
+        data = parse_line(buf)
     except InvalidLine:
         return
 
@@ -96,7 +91,7 @@ def get_data():
 
     post_data(data)
 
-    print(line, end="")
+    # print(line, end="")
 
 
 def post_data(data):

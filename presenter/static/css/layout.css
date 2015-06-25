@@ -19,3 +19,10 @@
 .spacer-50 {
     margin-top: 50px;
 }
+
+#map-canvas {
+    margin: 0 auto;
+    width: 800px;
+    height: 650px;
+    background-color: #CCC;
+}

@@ -4,6 +4,7 @@ values read from the sensors.
 """
 
 import math
+from PyCRC.CRCCCITT import CRCCCITT as CRC
 from .config import CALCULATE
 
 
@@ -52,28 +53,22 @@ def calculate_height(air_press, ground_press, ground_temp):
     return height
 
 
-def calculate_acc_x(raw_val):
+def calculate_acc(raw_val, direction):
     """
     Converts the raw value read from the accelleration sensor module,
     taking calibration into consideration.
     """
-    return 0.0072339 * raw_val + 0.45212
+    calibs = CALCULATE["acc"]["acc_calib"]
+    ACC_CALIB = {
+        "x": [0.0072339, 0.45212],
+        "y": [0.0072472, 0.39860],
+        "z": [0.0071289, 0.62377]
+    }
 
+    if direction not in calibs.keys():
+        raise ValueError("'direction' must be one of: 'x', 'y', 'z'.")
 
-def calculate_acc_y(raw_val):
-    """
-    Converts the raw value read from the accelleration sensor module,
-    taking calibration into consideration.
-    """
-    return 0.0072472 * raw_val - 0.39860
-
-
-def calculate_acc_z(raw_val):
-    """
-    Converts the raw value read from the accelleration sensor module,
-    taking calibration into consideration.
-    """
-    return 0.0071289 * raw_val + 0.62377
+    return calibs[direction][0] * raw_val + calibs[direction][1]
 
 
 def calculate_gyr(raw_val):
@@ -95,3 +90,23 @@ def calculate_mag(raw_val):
     """
     result = raw_val * 2 / ((2**15) - 1)
     return result
+
+
+def _calculate_crc(data):
+    """
+    Calculates the CRC CCITT value for `data`.
+    """
+    crc_obj = CRC()
+    return crc_obj.calculate(data)
+
+
+def verify_crc(crc_cansat, data_cansat):
+    """
+    Verfies the CRC.
+
+    Returns `True` if the CRCs match.
+    Returns `False` if the CRCs don't match.
+    """
+    crc_ground = _calculate_crc(data_cansat)
+
+    return crc_ground == crc_cansat

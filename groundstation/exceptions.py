@@ -17,6 +17,13 @@ class ParseError(GroundstationError):
     pass
 
 
+class CRCVerificationError(ParseError):
+    """
+    Exception raised when the CRC calculations do not match.
+    """
+    pass
+
+
 class MalformedPacket(ParseError):
     """
     Exception raised when a malformed packet is received,

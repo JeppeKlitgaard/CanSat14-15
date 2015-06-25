@@ -124,12 +124,20 @@ def live():
                            page_title="Live")
 
 
+@app.route("/map")
+def map():
+    """
+    Renders a live map page.
+    """
+    return render_template("map.html", page_title="Map")
+
+
 @app.route("/graph/<data_id>")
 def graph(data_id):
     """
     Renders the graph page using a ``data_id``.
     """
-    json_data = get_static_graph_data(data_id)
+    json_data = get_static_graph_data(data_id, force=True)
 
     return render_template("graph.html", graph_data=json_data, data_id=data_id,
                            replay_available=True, page_title="Graph")

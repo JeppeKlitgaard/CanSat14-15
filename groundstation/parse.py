@@ -5,14 +5,21 @@ data received from the CanSat (or Faker).
 
 from .exceptions import ParseError, MalformedPacket, InvalidLine
 from .calculate import (calculate_temp_NTC, calculate_press, calculate_height,
-                        calculate_gyr)
+                        calculate_gyr, calculate_acc, calculate_mag,
+                        verify_crc, _calculate_crc)
+from .utilities import convert_time
 from .config import EXAMPLE_DATA_CONFIG
 
 from copy import copy
 
+import struct
+from PyCRC.CRCCCITT import CRCCCITT as crc16
+from io import BytesIO
+
 import re
 
-HEAD = "SGCanScience"
+HEAD = "SGCan"
+MAGIC = 0xFF
 HEAD_SEP = ">"  # Separates Head of datastring.
 DATA_SEP = "|"  # Separates data-points of datastring.
 FIELD_SEP = ":"  # Separates key and value in a data field.
@@ -27,8 +34,9 @@ def validate_line(line):
     """
     Validates ``line``.
     """
-    if not VALID_PATTERN.match(line):
-        raise MalformedPacket("Got malformed packet: {}".format(line))
+    # if not VALID_PATTERN.match(line):
+    #     raise MalformedPacket("Got malformed packet: {}".format(line))
+    return True
 
 
 def handle_key(key):
@@ -48,41 +56,115 @@ def handle_value(value):
     return value
 
 
-def parse_line(line):
+def read_ubyte(buf):
+    """
+    Reads an integer from `buf`.
+    """
+    return ord(buf.read(1))
+
+
+def read_int(buf):
+    """
+    Reads an integer from `buf`.
+    """
+    return struct.unpack("h", buf.read(2))[0]
+
+
+def read_uint(buf):
+    """
+    Reads an unsigned integer from `buf`.
+    """
+    return struct.unpack("H", buf.read(2))[0]
+
+
+def read_unsigned_long(buf):
+    """
+    Reads an unsigned long from `buf`.
+    """
+    return struct.unpack("I", buf.read(4))[0]
+
+
+def read_signed_long(buf):
+    """
+    Reads an unsigned long from `buf`.
+    """
+    return struct.unpack("i", buf.read(4))[0]
+
+
+def read_double(buf):
+    """
+    Reads a double from `buf`.
+    """
+    return struct.unpack("f", buf.read(4))[0]
+
+
+def parse_line(buf):
     """Parses a line of output from the CanSat."""
-    line = line.replace("\n", "")
+    result = {}
+
+    head = buf.get_data(len(HEAD))
+    if head != HEAD:
+        while not buf.get_line():  # Try to reset state to next new line.
+            pass
+
+        raise MalformedPacket("Wrong HEAD.")
+
+    version = buf.read(1)
+
+    packet_size = read_ubyte(buf)
+
+    packet = buf.read(packet_size)
+
+    data_buf = BytesIO(bytes([ord(x) for x in packet]))
+
+    rest = buf.readline()
 
     try:
-        head, data_string = line.split(HEAD_SEP)
-        if head != HEAD:
-            raise ParseError("Got a wrong head.")
+        assert(ord(rest[0]) == MAGIC)
+        assert(rest[1] == "\n")
+        assert(len(rest) == 2)
+    except AssertionError:
+        raise MalformedPacket("Invalid tail.")
 
-    except ValueError:
-        raise ParseError("Wrong amount of HEAD_SEP's.")
+    print(head, version, packet_size, data_buf.getvalue())
 
-    data_fields = data_string.split(DATA_SEP)
+    result["GyrX"] = calculate_gyr(read_int(data_buf))
+    result["GyrY"] = calculate_gyr(read_int(data_buf))
+    result["GyrZ"] = calculate_gyr(read_int(data_buf))
 
-    data_fields = [x for x in data_fields if x]
+    result["AccX"] = calculate_acc(read_int(data_buf), "x")
+    result["AccY"] = calculate_acc(read_int(data_buf), "y")
+    result["AccZ"] = calculate_acc(read_int(data_buf), "z")
 
-    data = {}
-    for data_field in data_fields:
-        try:
-            key, value = data_field.split(FIELD_SEP)
-        except ValueError:
-            raise ParseError("Wrong amount of FIELD_SEP's.")
-        key = handle_key(key)
-        try:
-            value = handle_value(value)
-        except ValueError:
-            raise ParseError("Failed to handle value.")
-        data[key] = value
+    result["MagX"] = calculate_mag(read_int(data_buf))
+    result["MagY"] = calculate_mag(read_int(data_buf))
+    result["MagZ"] = calculate_mag(read_int(data_buf))
 
-    for required_field in REQUIRED_FIELDS:
-        if required_field not in data.keys():
-            raise ParseError(("A field '{}' went missing!"
-                              .format(required_field)))
+    #result["Temp_NTC"] = calculate_temp_NTC(read_int(data_buf))
+    data_buf.read(2)
+    result["Time"] = convert_time(read_unsigned_long(data_buf))
 
-    return data
+    #print(data_buf.read(4))
+    result["Temp_BMP180"] = read_double(data_buf)
+    #print(data_buf.read(4))
+    result["Press"] = calculate_press(read_double(data_buf))
+
+    result["Lat"] = read_double(data_buf)
+    result["Long"] = read_double(data_buf)
+
+    result["Alt_GPS"] = read_double(data_buf)
+    result["Course"] = read_double(data_buf)
+    result["HDOP"] = read_signed_long(data_buf)
+    result["Sats"] = read_unsigned_long(data_buf)
+
+    result["CRC16"] = read_uint(data_buf)
+
+    print(result["CRC16"])
+    print(_calculate_crc(data_buf.getvalue()[:-2]))
+    # assert(verify_crc(result["CRC16"], data_buf.getvalue()[:-2]))
+
+    import pprint
+    pprint.pprint(result)
 
 
 def easy_parse_line(line, data_config=None, verbose=True):
@@ -91,6 +173,8 @@ def easy_parse_line(line, data_config=None, verbose=True):
 
     Raises InvalidLine if ``line`` is not valid.
     """
+
+    return parse_line(line)
 
     if data_config is None:
         data_config = copy(EXAMPLE_DATA_CONFIG)

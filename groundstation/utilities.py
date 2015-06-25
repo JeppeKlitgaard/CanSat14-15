@@ -53,6 +53,17 @@ class Buffer(object):
         self.handle = handle
         self.line_buf = ""
 
+    def get_data(self, amount):
+        buf = ""
+
+        while len(buf) != amount:
+            buf += self.handle.read(1)
+
+        return buf
+
+    def read(self, amount):
+        return self.get_data(amount)
+
     def get_line(self):
         """
         Returns a string with a line of data.

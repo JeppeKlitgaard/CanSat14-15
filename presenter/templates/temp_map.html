@@ -1,0 +1,128 @@
+<div class="container">
+    <div id="map-canvas" style="width: 400px; height: 400px;">
+    </div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js"></script>
+<script>
+var map;
+var poly;
+
+var height;
+var latitude;
+var longitude;
+
+function initialize() {
+    var mapCanvas = document.getElementById("map-canvas")
+
+    var mapOptions = {
+        center: new google.maps.LatLng(39.1239, -9.3799),
+        zoom: 15,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+
+    map = new google.maps.Map(mapCanvas, mapOptions);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+//var socket = new WebSocket("ws://{{ host }}:8081/map");
+
+//socket.onmessage = function(event){
+//    json_obj = JSON.parse(event.data);
+
+//    {% if config.DEBUG %}
+//    console.log(json_obj)
+//    {% endif %}
+
+//}
+var prev_marker = new google.maps.Marker({
+    map: null
+});
+var i = 0;
+
+var previousPos = null;
+
+function plot(lat, lng, color){
+
+    var pos = new google.maps.LatLng(lat, lng);
+
+    if(previousPos != null && previousPos != pos){
+        line(pos, previousPos, color);
+    };
+
+    var marker = new google.maps.Marker({
+        position: pos,
+        title: "alt " + color,
+        map: map
+    });
+
+    prev_marker.setMap(null);
+    prev_marker = marker;
+    previousPos = pos;
+};
+
+function line(pos1, pos2, color){
+    var polyOptions = {
+        strokeColor: color,
+        strokeOpacity: 1.0,
+        strokeWeight: 3
+    };
+
+    poly = new google.maps.Polyline(polyOptions);
+
+    poly.setMap(map);
+
+    path = poly.getPath();
+    
+    path.push(pos1);
+    path.push(pos2);
+}
+
+function getHeightColour(height){
+    var r = 0;
+    var g = 0;
+    var b = 0;
+
+    if(height < 0){
+        r = 0;
+        g = 0;
+        b = 255;
+    }else if(height <= 250){
+        r = 0;
+        g = Math.round(255 * height / 250);
+        b = 255;
+    }else if(height <= 500){
+        r = 0;
+        g = 255;
+        b = Math.round(255 * (500 - height) / 250);
+    }else if(height <= 750){
+        r = Math.round(255 * (height - 500) / 250);
+        g = 255;
+        b = 0;
+    }else if(height <= 1000){
+        r = 255;
+        g = Math.round(255 * (1000 - height) / 250);
+        b = 0;
+    }else if(height > 1000){
+        r = 255;
+        g = 0;
+        b = 0;
+    }
+
+    var colour = "rgb(" + r + "," + g + "," + b + ")";
+
+    return colour;
+};
+
+function loop() {
+    setTimeout(function() {
+        plot(latitude, longitude, getHeightColour(height));
+
+        loop();
+    }, 1000)
+}
+
+//loop();
+
+</script>

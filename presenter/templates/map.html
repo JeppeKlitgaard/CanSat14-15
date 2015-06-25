@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+    <div id="map-canvas">
+    </div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js"></script>
+<script>
+var map;
+var poly;
+
+function initialize() {
+    var mapCanvas = document.getElementById("map-canvas")
+
+    var mapOptions = {
+        center: new google.maps.LatLng(44.5403, -78.5463),
+        zoom: 8,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+
+    var polyOptions = {
+        strokeColor: "#000000",
+        strokeOpacity: 1.0,
+        strokeWeight: 3
+    }
+
+    map = new google.maps.Map(mapCanvas, mapOptions);
+    poly = new google.maps.Polyline(polyOptions);
+    poly.setMap(map);
+
+    loop();
+
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+//var socket = new WebSocket("ws://{{ host }}:8081/map");
+
+//socket.onmessage = function(event){
+//    json_obj = JSON.parse(event.data);
+
+//    {% if config.DEBUG %}
+//    console.log(json_obj)
+//    {% endif %}
+
+//}
+var prev_marker = new google.maps.Marker({
+    map: null
+});
+var i = 0;
+function loop() {
+    setTimeout(function() {
+        i++;
+        var path = poly.getPath();
+
+        var pos = new google.maps.LatLng(41.8, -78.673341 + 1*i);
+
+        path.push(pos);
+        console.log(path);
+        var marker = new google.maps.Marker({
+            position: pos,
+            title: "# " + path.getLength(),
+            map: map
+        });
+
+        prev_marker.setMap(null);
+        prev_marker = marker;
+        loop();
+    }, 1000)
+}
+</script>
+{% endblock %}

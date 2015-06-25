@@ -1,3 +1,4 @@
+#include <util/crc16.h>
 
 #include <SPI.h>
 #include <SFE_BMP180.h>
@@ -10,6 +11,13 @@
 #define LSM9DS0_G   0x6B // Would be 0x6A if SDO_G is LOW
 LSM9DS0 dof(MODE_I2C, LSM9DS0_G, LSM9DS0_XM);
 
+inline uint16_t softcrcXMODEM(uint16_t seed, uint8_t *data, uint16_t datalen) {
+    for (uint16_t i=0; i<datalen; i++) {
+        seed = _crc_xmodem_update(seed,  data[i]);
+    }
+    return seed;
+}
+
 SFE_BMP180 pressure;
 TinyGPSPlus gps;
 
@@ -17,7 +25,97 @@ int cameraInterval = 20000; // ms
 unsigned long lastCameraTime;
 boolean cameraState = 0;
 
-int communicationPin = 7;
+int communicationPin = 15;
+
+const byte magic = 0xFF;
+
+const int s = 256;
+int to_send_next_pos = 0;
+byte to_send[s];
+
+uint16_t crc;
+
+union {
+  double d;
+  int i;
+  unsigned long ul;
+  uint32_t u32;
+  unsigned char b[4];
+} ba;
+//
+//uint16_t crc16(byte* data_p, byte length){
+//    unsigned char x;
+//    unsigned short crc = 0xFFFF;
+//
+//    while (length--){
+//        x = crc >> 8 ^ *data_p++;
+//        x ^= x>>4;
+//        crc = (crc << 8) ^ ((unsigned short)(x << 12)) ^ ((unsigned short)(x <<5)) ^ ((unsigned short)x);
+//    }
+//    return crc;
+//}
+
+void flush_buf() {
+  int data_size;
+
+  Serial1.print("SGCan");
+  Serial1.print("1");  // version
+
+  data_size = to_send_next_pos + 2; // CRC
+  Serial1.write((byte)data_size);
+
+  for (int k = 0; k < to_send_next_pos; k++) {
+    Serial1.write((byte) to_send[k]);
+  }
+
+  crc = softcrcXMODEM(0, to_send, to_send_next_pos);
+
+  byte hi = crc >> 8;
+  byte lo = crc & 0xFF;
+
+  Serial1.write(hi);
+  Serial1.write(lo);
+
+  Serial1.write(magic);
+
+  Serial1.print("\n");
+  Serial1.flush();
+  
+  to_send_next_pos = 0;
+}
+
+void add_double(double d) {
+  ba.d = d;
+  for (int k = 0; k < sizeof(double); k++) {
+    to_send[to_send_next_pos] = (char) ba.b[k];
+    to_send_next_pos++;
+  }
+}
+
+void add_int(int i) {
+  ba.i = i;
+  for (int k = 0; k < sizeof(int); k++) {
+    to_send[to_send_next_pos] = (char) ba.b[k];
+    to_send_next_pos++;
+  }
+}
+
+void add_unsigned_long(unsigned long ul) {
+  ba.ul = ul;
+  for (int k = 0; k < sizeof(long); k++) {
+    to_send[to_send_next_pos] = (char) ba.b[k];
+    to_send_next_pos++;
+  }
+}
+
+void add_uint32(uint32_t u32) {
+  ba.u32 = u32;
+  for (int k = 0; k < sizeof(uint32_t); k++) {
+    to_send[to_send_next_pos] = (char) ba.b[k];
+    to_send_next_pos++;
+  }
+}
+
 
 void setup() {
   Serial1.begin(19200);
@@ -26,18 +124,19 @@ void setup() {
   Serial3.begin(9600);
   
   pinMode(communicationPin, OUTPUT); 
-  
-  if (pressure.begin()){
-  Serial1.println("BMP180 init success");
-  }
-  else
-  {
-    // Oops, something went wrong, this is usually a connection problem,
-    // see the comments at the top of this sketch for the proper connections.
 
-    Serial1.println("BMP180 init fail\n\n");
-    while(1); // Pause forever.
-  }
+  pressure.begin();
+  // if (pressure.begin()){
+  // Serial1.println("BMP180 init success");
+  // }
+  // else
+  // {
+  //   // Oops, something went wrong, this is usually a connection problem,
+  //   // see the comments at the top of this sketch for the proper connections.
+
+  //   Serial1.println("BMP180 init fail\n\n");
+  //   while(1); // Pause forever.
+  // }
   
   
   // call it with declarations for sensor scales and data rates:
@@ -45,15 +144,15 @@ void setup() {
                               dof.A_SCALE_16G, dof.M_SCALE_2GS);
 
   // make sure communication with 9degree sensor was successful.
-  Serial1.print("LSM9DS0 WHO_AM_I's returned: 0x");
-  Serial1.println(status, HEX);
-  Serial1.println("Should be 0x49D4");
-  Serial1.println();
+  // Serial1.print("LSM9DS0 WHO_AM_I's returned: 0x");
+  // Serial1.println(status, HEX);
+  // Serial1.println("Should be 0x49D4");
+  // Serial1.println();
 
-  Serial.print("LSM9DS0 WHO_AM_I's returned: 0x");
-  Serial.println(status, HEX);
-  Serial.println("Should be 0x49D4");
-  Serial.println();
+  // Serial.print("LSM9DS0 WHO_AM_I's returned: 0x");
+  // Serial.println(status, HEX);
+  // Serial.println("Should be 0x49D4");
+  // Serial.println();
   
 }
 
@@ -65,7 +164,7 @@ void loop() {
   }
   
   if (millis() > lastCameraTime + cameraInterval) {
-    lastCameraTime = millis()
+    lastCameraTime = millis();
     if (cameraState == 0) {
       cameraState = 1;
       digitalWrite(communicationPin, HIGH);
@@ -80,7 +179,6 @@ void loop() {
     Serial.write(Serial3.read());
   }
  */
-  Serial1.println(""); //Print new-line
   delay(100); // wait before sending next data-batch
 
 }
@@ -89,68 +187,52 @@ void send_basics(){
   // Declares the variables and reads the "9 degrees of freedom"-data
   //Gyr data
   dof.readGyro();
-  int GyrX = dof.gx;
-  int GyrY = dof.gy;
-  int GyrZ = dof.gz;
+  
+  add_int(dof.gx);
+  add_int(dof.gy);
+  add_int(dof.gz);
 
   //Acc data
   dof.readAccel();
-  int AccX = dof.ax;
-  int AccY = dof.ay;
-  int AccZ = dof.az;
+
+  add_int(dof.ax);
+  add_int(dof.ay);
+  add_int(dof.az);
 
   //Mag data
   dof.readMag();
-  int MagX = dof.mx;
-  int MagY = dof.my;
-  int MagZ = dof.mz;
-  
-  //Declares the variable used for storing the NTC data
-  int NTC; //The analog input2
-  
-  //Reads the analog data from the corresponding sensor and assigns it to the variables declared above
-  NTC = analogRead(A2);
-  
-  // Sends all the read data via the send_data_field function
-  // Prints identifier
-  Serial1.print("SGCanScience>");
+
+  add_int(dof.mx);
+  add_int(dof.my);
+  add_int(dof.mz);
+
+  // NTC
+  add_int(analogRead(A2));
   
   //Print Time
-  send_data_field("Time", String(millis()));
-  
-  //Print NTC
-  send_data_field("NTC", String(NTC));
+  add_unsigned_long(millis());
   
   //Print BMP 180 pressure and temperature
-  send_pressTemp();
-  
-  //Print Gyr
-  send_data_field("GyrX", String(GyrX));
-  send_data_field("GyrY", String(GyrY));
-  send_data_field("GyrZ", String(GyrZ));
-
-  //Print Acc
-  send_data_field("AccX", String(AccX));
-  send_data_field("AccY", String(AccY));
-  send_data_field("AccZ", String(AccZ));
-
-  //Print Mag
-  send_data_field("MagX", String(MagX));
-  send_data_field("MagY", String(MagY));
-  send_data_field("MagZ", String(MagZ));
+  // Temperature - double
+  // Pressure - double
+  send_press_temp();
   
   //GPS
-  //Print Latitude
-  send_data_field_float("Lat", gps.location.lat(), 6);
-  
-  //Print Longitude
-  send_data_field_float("Long", gps.location.lng(), 6);
-  
-  //Print  Satellites
-  send_data_field("Sat", String(gps.satellites.value()));
+  add_double(gps.location.lat());
+  add_double(gps.location.lng());
+
+  add_double(gps.altitude.meters());
+
+  add_double(gps.course.deg());
+
+  add_unsigned_long(gps.hdop.value());  // signed, but it doesn't matter here, only on the groundstation.
+
+  add_uint32(gps.satellites.value());
+
+  flush_buf();
 }
 
-void send_pressTemp() {
+void send_press_temp() {
   
   char status;
   double T,P;
@@ -162,12 +244,11 @@ void send_pressTemp() {
     status = pressure.getTemperature(T);
       if (status != 0) {
       
-      /*     
-      Serial.print("Temperature:");
-      Serial.print(T,2);
-      Serial.print("|");
-      */
-      send_data_field_float("Temp", T, 2);
+          
+//      Serial1.print("Temperature:");
+//      Serial1.print(T,2);
+//      Serial1.print("|");
+      
       
       status = pressure.startPressure(3);
     
@@ -182,20 +263,12 @@ void send_pressTemp() {
           Serial.print(P,2);
           Serial.print("|");
           */
-          send_data_field_float("Press", P, 2);
+          
                 
         }
       }
     }
-  }     
-}
-
-void send_data_field(String key, String value) {
-  Serial1.print(key + ":" + value + "|");
-}
-
-void send_data_field_float(String key, float value, int width) {
-  Serial1.print(key + ":");
-  Serial1.print(value, width);
-  Serial1.print("|");
+  }
+  add_double(T);
+  add_double(P);
 }

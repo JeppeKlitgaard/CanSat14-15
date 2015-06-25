@@ -1,0 +1,156 @@
+/****************************************************************************** 
+LinkSprite_Cam
+Ryan Owens @ SparkFun Electronics>
+Revised by Joel Bartlett on 03/25/15 for compilation on Arduino 1.6+
+
+This code allows you to control the LinkSprite IR Camera (SEN-11610) with an Arduino microcontroller
+
+Development environment specifics:
+Arduino 1.6.0
+
+This code is beerware; if you see me (or any other SparkFun employee) at the local, and you've found our code helpful, please buy us a round!
+
+Distributed as-is; no warranty is given. 
+*********************************************************************************/
+
+/* Linksprite */
+byte incomingbyte;
+
+int a=0x0000,j=0,k=0,count=0;                    //Read Starting address       
+uint8_t MH,ML;
+boolean EndFlag=0;
+
+void SetBaudrateCmd();                              
+void SendResetCmd();
+void SendTakePhotoCmd();
+void SendReadDataCmd();
+void StopTakePhotoCmd();
+
+void setup()
+{ 
+  Serial.begin(38400);
+  Serial3.begin(38400);
+}
+
+void loop() 
+{
+     SendResetCmd();
+     SetBaudrateCmd();
+     delay(4000);                               //After reset, wait 2-3 second to send take picture command
+      
+      SendTakePhotoCmd();
+
+     while(Serial3.available()>0)
+      {
+        incomingbyte=Serial3.read();
+
+      }   
+      byte a[32];
+      
+      while(!EndFlag)
+      {  
+         j=0;
+         k=0;
+         count=0;
+         SendReadDataCmd();
+
+         delay(25);
+          while(Serial3.available()>0)
+          {
+               incomingbyte=Serial3.read();
+               k++;
+               if((k>5)&&(j<32)&&(!EndFlag))
+               {
+               a[j]=incomingbyte;
+               if((a[j-1]==0xFF)&&(a[j]==0xD9))      //Check if the picture is over
+               EndFlag=1;                           
+               j++;
+           count++;
+               }
+          }
+         
+          for(j=0;j<count;j++)
+          {   if(a[j]<0x10)
+              Serial.print("0");
+              Serial.print(a[j],HEX);
+              Serial.print(" ");
+          }                                       //Send jpeg picture over the serial port
+          Serial.println();
+      }
+    delay(1000);
+}
+
+void SetBaudrateCmd() {
+      Serial3.write(0x56);
+      Serial3.write((byte)0);
+      Serial3.write(0x24);
+      Serial3.write(0x03);
+      Serial3.write(0x01);
+      
+      // 2A F2 = 38400
+      // 0D A6 = 115200
+      Serial3.write(0x2a);
+      Serial3.write(0xf2);
+}
+
+//Send Reset command
+void SendResetCmd()
+{
+      Serial3.write(0x56);
+      Serial3.write((byte)0);
+      Serial3.write(0x26);
+      Serial3.write((byte)0);
+}
+
+//Send take picture command
+void SendTakePhotoCmd()
+{
+      Serial3.write(0x56);
+      Serial3.write((byte)0);
+      Serial3.write(0x36);
+      Serial3.write(0x01);
+      Serial3.write((byte)0);  
+}
+
+//Read data
+void SendReadDataCmd()
+{
+      MH=a/0x100;
+      ML=a%0x100;
+      Serial3.write(0x56);
+      Serial3.write((byte)0);
+      Serial3.write(0x32);
+      Serial3.write(0x0c);
+      Serial3.write((byte)0); 
+      Serial3.write(0x0a);
+      Serial3.write((byte)0);
+      Serial3.write((byte)0);
+      Serial3.write(MH);
+      Serial3.write(ML);   
+      Serial3.write((byte)0);
+      Serial3.write((byte)0);
+      Serial3.write((byte)0);
+      Serial3.write(0x20);
+      Serial3.write((byte)0);  
+      //Serial3.write(0x0a);
+      Serial3.write(0x01);
+      a+=0x20;                            //address increases 32£¬set according to buffer size
+}
+
+void StopTakePhotoCmd()
+{
+      Serial3.write(0x56);
+      Serial3.write((byte)0);
+      Serial3.write(0x36);
+      Serial3.write(0x01);
+      Serial3.write(0x03);        
+}
+
+
+
+
+
+
+
+
+
