@@ -26,6 +26,7 @@ unsigned long lastCameraTime;
 boolean cameraState = 0;
 
 int communicationPin = 15;
+<<<<<<< Updated upstream
 
 const byte magic = 0xFF;
 
@@ -116,6 +117,8 @@ void add_uint32(uint32_t u32) {
   }
 }
 
+=======
+>>>>>>> Stashed changes
 
 void setup() {
   Serial1.begin(19200);
