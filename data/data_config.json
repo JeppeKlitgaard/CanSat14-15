@@ -8,7 +8,6 @@
         "ground_temperature": 7.2,
         "ground_pressure": 100.75
     },
-    "SEPARATOR",
     {
         "id": "andoeya_rocket_launch",
         "name": "Rocket Launch - Andøya Space Centre",
@@ -17,5 +16,15 @@
         "end_time": -1,
         "ground_temperature": 5.3,
         "ground_pressure": 98.8
+    },
+    "SEPARATOR",
+    {
+        "id": "portugal_flight_test",
+        "name": "Flight Test - Portugal ESA CanSat 2015",
+        "file": "portugal_flight_test.log",
+        "start_time": 0,
+        "end_time": -1,
+        "ground_temperature": 27,
+        "ground_pressure": 101.79
     }
 ]
