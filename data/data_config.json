@@ -26,5 +26,14 @@
         "end_time": -1,
         "ground_temperature": 27,
         "ground_pressure": 101.79
+    },
+    {
+        "id": "portugal_rocket_launch",
+        "name": "Rocket Launch - Portugal ESA CanSat 2015",
+        "file": "portugal_rocket_launch.log",
+        "start_time": 0,
+        "end_time": -1,
+        "ground_temperature": 27,
+        "ground_pressure": 102.21
     }
 ]
