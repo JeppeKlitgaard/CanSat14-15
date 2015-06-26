@@ -88,7 +88,7 @@ def get_data():
         return
 
     try:
-        data = easy_parse_line(line)
+        data = easy_parse_line(line, version="live")
     except InvalidLine:
         return
 
