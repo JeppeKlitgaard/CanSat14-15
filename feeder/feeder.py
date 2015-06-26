@@ -87,9 +87,16 @@ def get_data():
     except InvalidLine:
         return
 
-    pprint(data)
+    rel_data = {
+        "NTC": data["Temp_NTC"],
+        "Pressure": data["Press"],
+        "Height": data["Height"],
+        "Gyroscope": data["GyrZ"] / 360 * 60  # RPM
+    }
 
-    post_data(data)
+    pprint(rel_data)
+
+    post_data(rel_data)
 
     # print(line, end="")
 

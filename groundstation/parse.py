@@ -98,14 +98,26 @@ def read_double(buf):
     return struct.unpack("f", buf.read(4))[0]
 
 
-def parse_line(buf):
+def unskew_buf(buf):
+    """
+    Returns the `buf` to a working state.
+    """
+    sbuf = bytes()
+
+    while True:
+        pass
+
+
+def parse_line(buf, data_config=None):
     """Parses a line of output from the CanSat."""
+    if data_config is None:
+        data_config = copy(EXAMPLE_DATA_CONFIG)
+
     result = {}
 
     head = buf.read(len(HEAD))
     if head != HEAD:
-        while not buf.readline():  # Try to reset state to next new line.
-            pass
+        buf.readline()  # Try to reset state to next new line.
         raise MalformedPacket("Wrong HEAD.")
 
     version = buf.read(1)
@@ -113,7 +125,6 @@ def parse_line(buf):
     packet_size = read_ubyte(buf)
 
     packet = buf.read(packet_size)
-    print(len(packet))
 
     data_buf = BytesIO(bytes([ord(x) for x in packet]))
 
@@ -139,12 +150,10 @@ def parse_line(buf):
     result["MagZ"] = calculate_mag(read_int(data_buf))
 
     result["Temp_NTC"] = calculate_temp_NTC(read_int(data_buf))
-    data_buf.read(2)
+
     result["Time"] = convert_time(read_unsigned_long(data_buf))
 
-    #print(data_buf.read(4))
     result["Temp_BMP180"] = read_double(data_buf)
-    #print(data_buf.read(4))
     result["Press"] = calculate_press(read_double(data_buf))
 
     result["Lat"] = read_double(data_buf)
@@ -157,16 +166,19 @@ def parse_line(buf):
 
     result["CRC16"] = data_buf.read(2)
 
-    print(result["CRC16"])
+    result["Height"] = calculate_height(result["Press"],
+                                        data_config["ground_pressure"],
+                                        data_config["ground_temperature"])
 
     data_buf.seek(0)
-    print(_calculate_crc(data_buf.read(packet_size - 2)))
     try:
         assert(verify_crc(result["CRC16"], data_buf.getvalue()[:-2]))
     except AssertionError:
         raise CRCValidationError("CRC validation failed.")
     import pprint
     pprint.pprint(result)
+
+    return result
 
 
 def easy_parse_line(line, data_config=None, verbose=True):
