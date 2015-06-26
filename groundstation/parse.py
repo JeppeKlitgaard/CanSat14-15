@@ -114,11 +114,18 @@ def easy_parse_line(line, data_config=None, verbose=True):
 
     data = {}
     data["Time"] = raw_data["Time"]
+
     data["NTC"] = calculate_temp_NTC(raw_data["NTC"])
+
+    data["BMP180_Temp"] = raw_data["Temp"]
+
     data["Pressure"] = calculate_press(raw_data["Press"])
+
     data["Height"] = calculate_height(data["Pressure"],
                                       data_config["ground_pressure"],
                                       data_config["ground_temperature"])
     data["Gyroscope"] = calculate_gyr(raw_data["GyrZ"]) / 360 * 60  # RPM
+    data["Latitude"] = raw_data["Lat"]
+    data["Longitude"] = raw_data["Long"]
 
     return data

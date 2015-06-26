@@ -124,6 +124,14 @@ def live():
                            page_title="Live")
 
 
+@app.route("/map")
+def map():
+    """
+    Renders a live map page.
+    """
+    return render_template("map.html", page_title="Map")
+
+
 @app.route("/graph/<data_id>")
 def graph(data_id):
     """

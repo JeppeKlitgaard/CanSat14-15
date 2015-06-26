@@ -5,8 +5,12 @@
 <script>
 all_data = {{ graph_data|safe }}
 $(function () {
-    createGraph("#graph-temp", "NTC", "Temperature", "Seconds since boot",
-                "Temperature in degrees celsius", all_data["Temp"]);
+    createGraph("#graph-temp", "Temp (NTC)", "Temperature", "Seconds since boot",
+                "Temperature in degrees celsius", all_data["NTC_Temp"],
+                [{
+                    name: "Temp (BMP180)",
+                    data: all_data["BMP180_Temp"]
+                }]);
 
     createGraph("#graph-press", "Pressure", "Pressure", "Seconds since boot",
                 "Pressure in kilopascal", all_data["Press"]);

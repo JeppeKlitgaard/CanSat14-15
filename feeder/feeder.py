@@ -94,7 +94,17 @@ def get_data():
 
     pprint(data)
 
-    post_data(data)
+    rel_data = {
+        "Time": data["Time"],
+        "Temp": data["BMP180_Temp"],
+        "Pressure": data["Pressure"],
+        "Height": data["Height"],
+        "Gyroscope": data["Gyroscope"],
+        "Latitude": data["Latitude"],
+        "Longitude": data["Longitude"]
+    }
+
+    post_data(rel_data)
 
     print(line, end="")
 

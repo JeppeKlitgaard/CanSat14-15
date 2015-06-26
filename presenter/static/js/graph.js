@@ -25,7 +25,22 @@ Highcharts.setOptions({
     }
 });
 
-function createGraph(domIdent, dataIdent, title, xText, yText, seriesInitData) {
+function createGraph(domIdent, dataIdent, title, xText, yText, seriesInitData, extra_series) {
+    extra_series = extra_series || [];
+    // extra_series = [
+    //     {name: "asd", data: [[1,2], [3,4]]}
+    // ]
+    ser = [
+        {
+            name: dataIdent,
+            data: seriesInitData
+        }
+    ];
+
+    for (i = 0; i < extra_series.length; i++) {
+        ser.push(extra_series[i])
+    };
+
     $(domIdent).highcharts('StockChart', $.extend(true, {}, baseSettings, {
         chart: {
             events: {
@@ -64,11 +79,6 @@ function createGraph(domIdent, dataIdent, title, xText, yText, seriesInitData) {
             }
         },
 
-        series: [
-            {
-                name: dataIdent,
-                data: seriesInitData
-            }
-        ]
+        series: ser
     }));
 }

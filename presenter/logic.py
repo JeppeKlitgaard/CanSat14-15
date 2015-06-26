@@ -62,7 +62,8 @@ def get_static_graph_data(data_id, force=False):
         with open(_get_data_file(data_id), "r") as f:
             data_conf = _get_data_config(data_id)
 
-            data_temp = []
+            data_temp_1 = []
+            data_temp_2 = []
             data_press = []
             data_height = []
             data_gyro = []
@@ -73,7 +74,8 @@ def get_static_graph_data(data_id, force=False):
 
                     time = convert_time(values["Time"] - data_conf["start_time"])
 
-                    data_temp.append([time, values["NTC"]])
+                    data_temp_1.append([time, values["NTC"]])
+                    data_temp_2.append([time, values["BMP180_Temp"]])
                     data_press.append([time, values["Pressure"]])
                     data_height.append([time, values["Height"]])
                     data_gyro.append([time, values["Gyroscope"]])
@@ -85,12 +87,13 @@ def get_static_graph_data(data_id, force=False):
     except FileNotFoundError:
         abort(404)
 
-    for lst in [data_temp, data_press, data_height, data_gyro]:
+    for lst in [data_temp_1, data_temp_2, data_press, data_height, data_gyro]:
         # Sort by time
         lst.sort(key=lambda x: x[0])
 
     data = {
-        "Temp": data_temp,
+        "NTC_Temp": data_temp_1,
+        "BMP180_Temp": data_temp_2,
         "Press": data_press,
         "Height": data_height,
         "Gyro": data_gyro
