@@ -30,6 +30,8 @@ LOG_FILE = listener_get_log_file()
 log_handle = open(LOG_FILE, "w")
 
 # Communication file
+os.remove(COM_FILE)
+os.mkfifo(COM_FILE)
 com_handle = open(COM_FILE, "w")
 
 
