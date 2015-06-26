@@ -91,8 +91,16 @@ def get_data():
         "NTC": data["Temp_NTC"],
         "Pressure": data["Press"],
         "Height": data["Height"],
-        "Gyroscope": data["GyrZ"] / 360 * 60  # RPM
+        "Gyroscope": data["GyrZ"] / 360 * 60,  # RPM
+        "Latitude": data["Lat"],
+        "Longitude": data["Long"]
     }
+
+    # import random
+    # if random.randint(0, 10) == 5:
+    #     rel_data["Latitude"] = float(random.randint(0, 10))
+    #     rel_data["Longitude"] = float(random.randint(0, 10))
+    #     rel_data["Height"] = float(random.randint(0, 1500))
 
     pprint(rel_data)
 

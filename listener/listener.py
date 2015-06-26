@@ -38,7 +38,7 @@ com_handle = open(COM_FILE, "w")
 EXITCHARCTER = chr(0x1d)
 
 PORT = discover_serial_port()
-BAUDRATE = 19200
+BAUDRATE = 9600
 
 RTS = None
 DTR = None

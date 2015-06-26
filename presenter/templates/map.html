@@ -11,27 +11,20 @@
 var map;
 var poly;
 
+var height;
+var latitude;
+var longitude;
+
 function initialize() {
     var mapCanvas = document.getElementById("map-canvas")
 
     var mapOptions = {
-        center: new google.maps.LatLng(44.5403, -78.5463),
-        zoom: 8,
+        center: new google.maps.LatLng(39.1239, -9.3799),
+        zoom: 15,
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
 
-    var polyOptions = {
-        strokeColor: "#000000",
-        strokeOpacity: 1.0,
-        strokeWeight: 3
-    }
-
     map = new google.maps.Map(mapCanvas, mapOptions);
-    poly = new google.maps.Polyline(polyOptions);
-    poly.setMap(map);
-
-    loop();
-
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
@@ -50,25 +43,104 @@ var prev_marker = new google.maps.Marker({
     map: null
 });
 var i = 0;
-function loop() {
-    setTimeout(function() {
-        i++;
-        var path = poly.getPath();
 
-        var pos = new google.maps.LatLng(41.8, -78.673341 + 1*i);
+var previousLat = 0.0;
+var previousLng = 0.0;
+var previousPos = null;
 
-        path.push(pos);
-        console.log(path);
+function plot(lat, lng, color){
+
+
+
+    if((previousLat != lat) && (lat != 0.0) && (previousLng != lng) && (lng != 0.0) ){
+        var pos = new google.maps.LatLng(lat, lng);
+
+        if(previousPos != null) {
+            line(pos, previousPos, color);
+        }
         var marker = new google.maps.Marker({
             position: pos,
-            title: "# " + path.getLength(),
+            title: "alt " + color,
             map: map
         });
 
+        previousPos = pos;
         prev_marker.setMap(null);
         prev_marker = marker;
-        loop();
-    }, 1000)
+    };
+
+
+    previousLat = lat;
+    previousLng = lng;
+};
+
+function line(pos1, pos2, color){
+    var polyOptions = {
+        strokeColor: color,
+        strokeOpacity: 1.0,
+        strokeWeight: 3
+    };
+
+    poly = new google.maps.Polyline(polyOptions);
+
+    poly.setMap(map);
+
+    path = poly.getPath();
+    
+    path.push(pos1);
+    path.push(pos2);
 }
+
+function getHeightColour(height){
+    var r = 0;
+    var g = 0;
+    var b = 0;
+
+    if(height < 0){
+        r = 0;
+        g = 0;
+        b = 255;
+    }else if(height <= 250){
+        r = 0;
+        g = Math.round(255 * height / 250);
+        b = 255;
+    }else if(height <= 500){
+        r = 0;
+        g = 255;
+        b = Math.round(255 * (500 - height) / 250);
+    }else if(height <= 750){
+        r = Math.round(255 * (height - 500) / 250);
+        g = 255;
+        b = 0;
+    }else if(height <= 1000){
+        r = 255;
+        g = Math.round(255 * (1000 - height) / 250);
+        b = 0;
+    }else if(height > 1000){
+        r = 255;
+        g = 0;
+        b = 0;
+    }
+
+    var colour = "rgb(" + r + "," + g + "," + b + ")";
+
+    return colour;
+};
+
+var socket = new WebSocket("ws://{{request.headers.host}}:8081/live");
+
+socket.onmessage = function(event){
+    json_obj = JSON.parse(event.data);
+
+    {% if config.DEBUG %}
+    console.log(json_obj)
+    {% endif %}
+
+    colour = getHeightColour(json_obj["Height"]);
+    plot(parseFloat(json_obj["Latitude"]), parseFloat(json_obj["Longitude"]), colour);
+}
+
+//loop();
+
 </script>
 {% endblock %}

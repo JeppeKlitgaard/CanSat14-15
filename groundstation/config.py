@@ -54,5 +54,5 @@ EXAMPLE_DATA_CONFIG = {
     "start_time": 0,
     "end_time": -1,
     "ground_temperature": 0,
-    "ground_pressure": 100
+    "ground_pressure": 101
 }

@@ -6,6 +6,8 @@
 #include <SFE_LSM9DS0.h>
 #include <TinyGPS++.h>
 
+#include <MemoryFree.h>
+
 #define lo8(x) ((x)&0xff)
 #define hi8(x) ((x)>>8)
 
@@ -128,7 +130,8 @@ void add_uint32(uint32_t u32) {
 }
 
 void setup() {
-  Serial1.begin(19200);
+  Serial.begin(9600);
+  Serial1.begin(9600);
  
   //GPS Baud
   Serial3.begin(9600);
@@ -183,6 +186,7 @@ void loop() {
       digitalWrite(communicationPin, LOW);
     }
   }
+  Serial.println(freeMemory());
   send_basics(); // Sends the collected data, which is read in the send_basics function
  /* 
   if(Serial3.available()){
