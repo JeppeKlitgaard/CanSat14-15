@@ -79,6 +79,7 @@ sftp-config.json
 # ### Can Science ###
 *.csv
 *.db
+*.jpg
 images
 note_til_cansat_holdet.txt
 com_file
