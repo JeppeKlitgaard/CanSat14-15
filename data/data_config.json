@@ -6,7 +6,8 @@
         "start_time": 0,
         "end_time": -1,
         "ground_temperature": 7.2,
-        "ground_pressure": 100.75
+        "ground_pressure": 100.75,
+        "protocol_version": "andoeya2015"
     },
     {
         "id": "andoeya_rocket_launch",
@@ -15,7 +16,8 @@
         "start_time": 1603538,
         "end_time": -1,
         "ground_temperature": 5.3,
-        "ground_pressure": 98.8
+        "ground_pressure": 98.8,
+        "protocol_version": "andoeya2015"
     },
     "SEPARATOR",
     {
@@ -25,7 +27,8 @@
         "start_time": 0,
         "end_time": -1,
         "ground_temperature": 27,
-        "ground_pressure": 101.79
+        "ground_pressure": 101.79,
+        "protocol_version": "portugal2015"
     },
     {
         "id": "portugal_rocket_launch",
@@ -34,6 +37,7 @@
         "start_time": 0,
         "end_time": -1,
         "ground_temperature": 27,
-        "ground_pressure": 102.21
+        "ground_pressure": 102.21,
+        "protocol_version": "portugal2015"
     }
 ]

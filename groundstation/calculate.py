@@ -28,12 +28,42 @@ def calculate_temp_NTC(raw_val):
     return temp
 
 
-def calculate_press(raw_val):
+def calculate_temp_LM35(raw_val):
+    """
+    Converts the raw value read from the LM35 temperature sensor
+    module into degrees celsius.
+    """
+    return (500 / 1023) * raw_val
+
+
+def calculate_press(*args, **kwargs):
     """
     Converts the raw value read from the pressure sensor module
     into kilopascal.
     """
+    version = kwargs["version"]
+    del kwargs["version"]
+
+    if version in ["live", "portugal2015"]:
+        return _calculate_press_portugal2015(*args, **kwargs)
+
+    elif version in ["andoeya2015"]:
+        return _calculate_press_andoeya2015(*args, **kwargs)
+
+    else:
+        raise ValueError("Invalid 'version'.")
+
+
+def _calculate_press_portugal2015(raw_val):
     return raw_val / 10
+
+
+def _calculate_press_andoeya2015(raw_val):
+    """
+    Converts the raw value read from the pressure sensor module
+    into kilopascal.
+    """
+    return ((100 / 921) * raw_val) + 10
 
 
 def calculate_height(air_press, ground_press, ground_temp):
