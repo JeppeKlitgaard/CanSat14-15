@@ -17,7 +17,7 @@ class ParseError(GroundstationError):
     pass
 
 
-class CRCVerificationError(ParseError):
+class CRCValidationError(ParseError):
     """
     Exception raised when the CRC calculations do not match.
     """

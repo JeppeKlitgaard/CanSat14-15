@@ -59,10 +59,12 @@ class Buffer(object):
         while len(buf) != amount:
             buf += self.handle.read(1)
 
+        print(buf, len(buf), amount)
         return buf
 
     def read(self, amount):
         return self.get_data(amount)
+        return self.handle.read(amount)
 
     def get_line(self):
         """
@@ -77,3 +79,6 @@ class Buffer(object):
             return result
         else:
             return
+
+    def readline(self):
+        return self.handle.readline()

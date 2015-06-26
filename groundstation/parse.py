@@ -3,7 +3,8 @@ Contains functions and classes used to parse, handle, validate and interpret
 data received from the CanSat (or Faker).
 """
 
-from .exceptions import ParseError, MalformedPacket, InvalidLine
+from .exceptions import (ParseError, MalformedPacket, InvalidLine,
+                         CRCValidationError)
 from .calculate import (calculate_temp_NTC, calculate_press, calculate_height,
                         calculate_gyr, calculate_acc, calculate_mag,
                         verify_crc, _calculate_crc)
@@ -13,7 +14,6 @@ from .config import EXAMPLE_DATA_CONFIG
 from copy import copy
 
 import struct
-from PyCRC.CRCCCITT import CRCCCITT as crc16
 from io import BytesIO
 
 import re
@@ -70,11 +70,11 @@ def read_int(buf):
     return struct.unpack("h", buf.read(2))[0]
 
 
-def read_uint(buf):
+def read_uint(buf, endianness=""):
     """
     Reads an unsigned integer from `buf`.
     """
-    return struct.unpack("H", buf.read(2))[0]
+    return struct.unpack(endianness + "H", buf.read(2))[0]
 
 
 def read_unsigned_long(buf):
@@ -102,11 +102,10 @@ def parse_line(buf):
     """Parses a line of output from the CanSat."""
     result = {}
 
-    head = buf.get_data(len(HEAD))
+    head = buf.read(len(HEAD))
     if head != HEAD:
-        while not buf.get_line():  # Try to reset state to next new line.
+        while not buf.readline():  # Try to reset state to next new line.
             pass
-
         raise MalformedPacket("Wrong HEAD.")
 
     version = buf.read(1)
@@ -114,6 +113,7 @@ def parse_line(buf):
     packet_size = read_ubyte(buf)
 
     packet = buf.read(packet_size)
+    print(len(packet))
 
     data_buf = BytesIO(bytes([ord(x) for x in packet]))
 
@@ -125,8 +125,6 @@ def parse_line(buf):
         assert(len(rest) == 2)
     except AssertionError:
         raise MalformedPacket("Invalid tail.")
-
-    print(head, version, packet_size, data_buf.getvalue())
 
     result["GyrX"] = calculate_gyr(read_int(data_buf))
     result["GyrY"] = calculate_gyr(read_int(data_buf))
@@ -140,7 +138,7 @@ def parse_line(buf):
     result["MagY"] = calculate_mag(read_int(data_buf))
     result["MagZ"] = calculate_mag(read_int(data_buf))
 
-    #result["Temp_NTC"] = calculate_temp_NTC(read_int(data_buf))
+    result["Temp_NTC"] = calculate_temp_NTC(read_int(data_buf))
     data_buf.read(2)
     result["Time"] = convert_time(read_unsigned_long(data_buf))
 
@@ -157,12 +155,16 @@ def parse_line(buf):
     result["HDOP"] = read_signed_long(data_buf)
     result["Sats"] = read_unsigned_long(data_buf)
 
-    result["CRC16"] = read_uint(data_buf)
+    result["CRC16"] = data_buf.read(2)
 
     print(result["CRC16"])
-    print(_calculate_crc(data_buf.getvalue()[:-2]))
-    # assert(verify_crc(result["CRC16"], data_buf.getvalue()[:-2]))
 
+    data_buf.seek(0)
+    print(_calculate_crc(data_buf.read(packet_size - 2)))
+    try:
+        assert(verify_crc(result["CRC16"], data_buf.getvalue()[:-2]))
+    except AssertionError:
+        raise CRCValidationError("CRC validation failed.")
     import pprint
     pprint.pprint(result)
 

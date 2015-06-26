@@ -4,8 +4,14 @@ values read from the sensors.
 """
 
 import math
-from PyCRC.CRCCCITT import CRCCCITT as CRC
+import os
+
+from sh import Command
+import subprocess
+
 from .config import CALCULATE
+
+import time
 
 
 TEMP_GROUND = 2
@@ -59,11 +65,6 @@ def calculate_acc(raw_val, direction):
     taking calibration into consideration.
     """
     calibs = CALCULATE["acc"]["acc_calib"]
-    ACC_CALIB = {
-        "x": [0.0072339, 0.45212],
-        "y": [0.0072472, 0.39860],
-        "z": [0.0071289, 0.62377]
-    }
 
     if direction not in calibs.keys():
         raise ValueError("'direction' must be one of: 'x', 'y', 'z'.")
@@ -96,8 +97,17 @@ def _calculate_crc(data):
     """
     Calculates the CRC CCITT value for `data`.
     """
-    crc_obj = CRC()
-    return crc_obj.calculate(data)
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    path = os.path.abspath(path)
+    path = os.path.join(path, "crc")
+
+    proc = subprocess.Popen([path], stdout=subprocess.PIPE,
+                            stdin=subprocess.PIPE, stderr=subprocess.PIPE,
+                            bufsize=0)
+
+    checksum = proc.communicate(data)[0]
+
+    return checksum
 
 
 def verify_crc(crc_cansat, data_cansat):
