@@ -31,14 +31,16 @@ if args.data_config_id:
 else:
     data_config = EXAMPLE_DATA_CONFIG
 
-datas = easy_parse_line(input_handle.readline()).keys()
+datas = easy_parse_line(input_handle.readline(),
+                        version=data_config["protocol_version"]).keys()
 input_handle.seek(0)
 
 csvwriter = csv.DictWriter(output_handle, datas)
 csvwriter.writeheader()
 
 for line in input_handle:
-    data = easy_parse_line(line, data_config)
+    data = easy_parse_line(line, data_config,
+                           version=data_config["protocol_version"])
 
     csvwriter.writerow(data)
 
