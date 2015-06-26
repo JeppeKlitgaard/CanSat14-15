@@ -38,7 +38,7 @@ csvwriter = csv.DictWriter(output_handle, datas)
 csvwriter.writeheader()
 
 for line in input_handle:
-    data = easy_parse_line(line, data)
+    data = easy_parse_line(line, data_config)
 
     csvwriter.writerow(data)
 
