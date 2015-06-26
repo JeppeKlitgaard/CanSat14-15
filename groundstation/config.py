@@ -37,6 +37,13 @@ CALCULATE = {
         "temperature_gradient": -0.0065,
         "gas_constant": 287.06,
         "gravitational_accelleration": 9.82
+    },
+    "acc": {
+        "acc_calib": {
+            "x": [0.0072339, 0.45212],
+            "y": [0.0072472, 0.39860],
+            "z": [0.0071289, 0.62377]
+        }
     }
 }
 

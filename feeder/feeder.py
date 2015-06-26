@@ -99,7 +99,7 @@ def get_data():
         "Temp": data["BMP180_Temp"],
         "Pressure": data["Pressure"],
         "Height": data["Height"],
-        "Gyroscope": data["Gyroscope"],
+        "Gyroscope": data["GyrZ"],
         "Latitude": data["Latitude"],
         "Longitude": data["Longitude"]
     }

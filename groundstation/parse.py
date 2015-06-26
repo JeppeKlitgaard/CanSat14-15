@@ -5,7 +5,7 @@ data received from the CanSat (or Faker).
 
 from .exceptions import ParseError, MalformedPacket, InvalidLine
 from .calculate import (calculate_temp_NTC, calculate_press, calculate_height,
-                        calculate_gyr)
+                        calculate_gyr, calculate_acc, calculate_mag)
 from .config import EXAMPLE_DATA_CONFIG
 
 from copy import copy
@@ -121,11 +121,24 @@ def easy_parse_line(line, data_config=None, verbose=True):
 
     data["Pressure"] = calculate_press(raw_data["Press"])
 
+    data["GyrX"] = calculate_gyr(raw_data["GyrX"]) / 360 * 60  # RPM
+    data["GyrY"] = calculate_gyr(raw_data["GyrY"]) / 360 * 60  # RPM
+    data["GyrZ"] = calculate_gyr(raw_data["GyrZ"]) / 360 * 60  # RPM
+
+    data["AccX"] = calculate_acc(raw_data["AccX"], "x")
+    data["AccY"] = calculate_acc(raw_data["AccY"], "y")
+    data["AccZ"] = calculate_acc(raw_data["AccZ"], "z")
+
+    data["MagX"] = calculate_mag(raw_data["MagX"])
+    data["MagY"] = calculate_mag(raw_data["MagY"])
+    data["MagZ"] = calculate_mag(raw_data["MagZ"])
+
     data["Height"] = calculate_height(data["Pressure"],
                                       data_config["ground_pressure"],
                                       data_config["ground_temperature"])
-    data["Gyroscope"] = calculate_gyr(raw_data["GyrZ"]) / 360 * 60  # RPM
+
     data["Latitude"] = raw_data["Lat"]
     data["Longitude"] = raw_data["Long"]
+    data["Satelittes"] = raw_data["Sat"]
 
     return data
