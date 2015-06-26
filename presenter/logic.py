@@ -78,7 +78,7 @@ def get_static_graph_data(data_id, force=False):
                     data_temp_2.append([time, values["BMP180_Temp"]])
                     data_press.append([time, values["Pressure"]])
                     data_height.append([time, values["Height"]])
-                    data_gyro.append([time, values["Gyroscope"]])
+                    data_gyro.append([time, values["GyrZ"]])
 
                 except ParseError:
                     if not force:
