@@ -53,7 +53,7 @@ def _get_data_config(data_id):
     return matches[0]
 
 
-def get_static_graph_data(data_id, force=False):
+def get_static_data(data_id, usage, force=False):
     """
     Returns a jsonified string of data to be sent along with a Response to a
     client connected to the static graph endpoint.
@@ -63,25 +63,34 @@ def get_static_graph_data(data_id, force=False):
     version = data_conf["protocol_version"]
 
     if version in ["portugal2015", "live"]:
-        return _get_static_graph_data_portugal2015(data_id, data_conf, force)
+        return _get_static_data_portugal2015(data_id, usage, data_conf, force)
 
     elif version in ["andoeya2015"]:
-        return _get_static_graph_data_andoeya2015(data_id, data_conf, force)
+        return _get_static_data_andoeya2015(data_id, usage, data_conf, force)
 
     else:
         raise ValueError("Invalid 'version'.")
 
 
-def _get_static_graph_data_portugal2015(data_id, data_conf, force=False):
+def _get_static_data_portugal2015(data_id, usage, data_conf, force=False):
     """
     Returns a jsonified string of data to be sent along with a Response to a
     client connected to the static graph endpoint.
     """
+    if usage == "graph":
+        types = ["NTC_Temp", "BMP180_Temp", "Press", "Height", "Gyro"]
+    elif usage == "map":
+        types = ["Lat", "Long", "Height"]
+    else:
+        raise ValueError("Invalid 'usage'.")
+
     data_temp_1 = []
     data_temp_2 = []
     data_press = []
     data_height = []
     data_gyro = []
+    data_lat = []
+    data_long = []
 
     try:
         with open(_get_data_file(data_id), "r") as f:
@@ -97,6 +106,8 @@ def _get_static_graph_data_portugal2015(data_id, data_conf, force=False):
                         data_press.append([time, values["Pressure"]])
                         data_height.append([time, values["Height"]])
                         data_gyro.append([time, values["GyrZ"]])
+                        data_lat.append([time, values["Latitude"]])
+                        data_long.append([time, values["Longitude"]])
 
                     except ParseError:
                         if not force:
@@ -114,23 +125,36 @@ def _get_static_graph_data_portugal2015(data_id, data_conf, force=False):
         "BMP180_Temp": data_temp_2,
         "Press": data_press,
         "Height": data_height,
-        "Gyro": data_gyro
+        "Gyro": data_gyro,
+        "Lat": data_lat,
+        "Long": data_long
     }
 
-    json_data = json.dumps(data, separators=(",", ":"))
+    rel_data = {k: v for (k, v) in data.items() if k in types}
+
+    json_data = json.dumps(rel_data, separators=(",", ":"))
 
     return json_data
 
 
-def _get_static_graph_data_andoeya2015(data_id, data_conf, force=False):
+def _get_static_data_andoeya2015(data_id, usage, data_conf, force=False):
     """
     Returns a jsonified string of data to be sent along with a Response to a
     client connected to the static graph endpoint.
     """
+    if usage == "graph":
+        types = ["NTC_Temp", "Press", "Height", "Gyro"]
+    elif usage == "map":
+        types = ["Lat", "Long", "Height"]
+    else:
+        raise ValueError("Invalid 'usage'.")
+
     data_temp = []
     data_press = []
     data_height = []
     data_gyro = []
+    data_lat = []
+    data_long = []
 
     try:
         with open(_get_data_file(data_id), "r") as f:
@@ -145,6 +169,8 @@ def _get_static_graph_data_andoeya2015(data_id, data_conf, force=False):
                         data_press.append([time, values["Pressure"]])
                         data_height.append([time, values["Height"]])
                         data_gyro.append([time, values["GyrZ"]])
+                        data_lat.append([time, values["Latitude"]])
+                        data_long.append([time, values["Longitude"]])
 
                     except ParseError:
                         if not force:
@@ -161,9 +187,13 @@ def _get_static_graph_data_andoeya2015(data_id, data_conf, force=False):
         "NTC_Temp": data_temp,
         "Press": data_press,
         "Height": data_height,
-        "Gyro": data_gyro
+        "Gyro": data_gyro,
+        "Lat": data_lat,
+        "Long": data_long
     }
 
-    json_data = json.dumps(data, separators=(",", ":"))
+    rel_data = {k: v for (k, v) in data.items() if k in types}
+
+    json_data = json.dumps(rel_data, separators=(",", ":"))
 
     return json_data

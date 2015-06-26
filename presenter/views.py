@@ -14,7 +14,7 @@ from playhouse.flask_utils import object_list, get_object_or_404
 
 from .models import Entry
 
-from .logic import get_static_graph_data, get_global_data_config
+from .logic import (get_static_data, get_global_data_config)
 
 
 # pylint: disable=unused-argument
@@ -115,21 +115,21 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/live")
-def live():
+@app.route("/live/graph")
+def live_graph():
     """
     Renders the live page.
     """
-    return render_template("live.html", replay_available=False,
-                           page_title="Live")
+    return render_template("live_graph.html", replay_available=False,
+                           page_title="Live Graph")
 
 
-@app.route("/map")
-def map():
+@app.route("/live/map")
+def live_map():
     """
-    Renders a live map page.
+    Renders the live page.
     """
-    return render_template("map.html", page_title="Map")
+    return render_template("live_map.html", page_title="Live Map")
 
 
 @app.route("/graph/<data_id>")
@@ -137,10 +137,20 @@ def graph(data_id):
     """
     Renders the graph page using a ``data_id``.
     """
-    json_data = get_static_graph_data(data_id)
+    json_data = get_static_data(data_id, "graph")
 
     return render_template("graph.html", graph_data=json_data, data_id=data_id,
                            replay_available=True, page_title="Graph")
+
+
+@app.route("/map/<data_id>")
+def map_(data_id):
+    """
+    Renders a live map page.
+    """
+    json_data = get_static_data(data_id, "map")
+
+    return render_template("map.html", gps_data=json_data, page_title="Map")
 
 
 @app.route("/replay/<data_id>")

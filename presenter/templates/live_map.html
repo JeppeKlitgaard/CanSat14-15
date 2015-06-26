@@ -8,8 +8,6 @@
 
 <script src="https://maps.googleapis.com/maps/api/js"></script>
 <script>
-gps_data = {{ gps_data|safe }}
-
 var map;
 var poly;
 
@@ -27,11 +25,6 @@ function initialize() {
     };
 
     map = new google.maps.Map(mapCanvas, mapOptions);
-
-    for (i = 0; i < gps_data["Long"].length; i++) {
-        colour = getHeightColour(gps_data["Height"][i][1])
-        plot(parseFloat(gps_data["Lat"][i][1]), parseFloat(gps_data["Long"][i][1]), colour)
-    }
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
@@ -134,6 +127,20 @@ function getHeightColour(height){
     return colour;
 };
 
+var socket = new WebSocket("ws://{{request.headers.host}}:8081/live");
+
+socket.onmessage = function(event){
+    json_obj = JSON.parse(event.data);
+
+    {% if config.DEBUG %}
+    console.log(json_obj)
+    {% endif %}
+
+    colour = getHeightColour(json_obj["Height"]);
+    plot(parseFloat(json_obj["Latitude"]), parseFloat(json_obj["Longitude"]), colour);
+}
+
+//loop();
 
 </script>
 {% endblock %}

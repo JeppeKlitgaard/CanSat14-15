@@ -32,7 +32,14 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li><a href="/live">Live</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Live <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="{{url_for('live_graph')}}">Graphs</a></li>
+                        <li class="divider"></li>
+                        <li><a href="{{url_for('live_map')}}">Map</a></li>
+                    </ul>
+                </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Graphs <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
@@ -41,6 +48,18 @@
                         <li class="divider"></li>
                         {% else %}
                         <li><a href="/graph/{{element.id}}">{{element.name}}</a></li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Map <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        {% for element in dropdown_data %}
+                        {% if element == "SEPARATOR" %}
+                        <li class="divider"></li>
+                        {% else %}
+                        <li><a href="/map/{{element.id}}">{{element.name}}</a></li>
                         {% endif %}
                         {% endfor %}
                     </ul>
