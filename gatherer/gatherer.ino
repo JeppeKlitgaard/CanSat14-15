@@ -6,17 +6,28 @@
 #include <SFE_LSM9DS0.h>
 #include <TinyGPS++.h>
 
+#define lo8(x) ((x)&0xff)
+#define hi8(x) ((x)>>8)
 
 #define LSM9DS0_XM  0x1D // Would be 0x1E if SDO_XM is LOW
 #define LSM9DS0_G   0x6B // Would be 0x6A if SDO_G is LOW
 LSM9DS0 dof(MODE_I2C, LSM9DS0_G, LSM9DS0_XM);
 
-inline uint16_t softcrcXMODEM(uint16_t seed, uint8_t *data, uint16_t datalen) {
+
+uint16_t crc_ccitt_update (uint16_t crc, uint8_t data) {
+  data ^= lo8 (crc);
+  data ^= data << 4;
+  return ((((uint16_t)data << 8) | hi8 (crc)) ^ (uint8_t)(data >> 4)
+    ^ ((uint16_t)data << 3));
+}
+
+inline uint16_t softcrc(uint16_t seed, uint8_t *data, uint16_t datalen) {
     for (uint16_t i=0; i<datalen; i++) {
-        seed = _crc_xmodem_update(seed,  data[i]);
+        seed = crc_ccitt_update(seed,  data[i]);
     }
     return seed;
 }
+
 
 SFE_BMP180 pressure;
 TinyGPSPlus gps;
@@ -26,9 +37,6 @@ unsigned long lastCameraTime;
 boolean cameraState = 0;
 
 int communicationPin = 15;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 
 const byte magic = 0xFF;
 
@@ -71,7 +79,7 @@ void flush_buf() {
     Serial1.write((byte) to_send[k]);
   }
 
-  crc = softcrcXMODEM(0, to_send, to_send_next_pos);
+  crc = softcrc(0, to_send, to_send_next_pos);
 
   byte hi = crc >> 8;
   byte lo = crc & 0xFF;
@@ -118,13 +126,6 @@ void add_uint32(uint32_t u32) {
     to_send_next_pos++;
   }
 }
-
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
 void setup() {
   Serial1.begin(19200);
