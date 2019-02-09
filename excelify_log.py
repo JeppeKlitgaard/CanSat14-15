@@ -23,6 +23,7 @@ parser = argparse.ArgumentParser(prog="Excelify Log",
 
 parser.add_argument("input_file")
 parser.add_argument("-o", dest="output_file")
+parser.add_argument("-c", dest="data_config_id")
 
 args = parser.parse_args()
 
