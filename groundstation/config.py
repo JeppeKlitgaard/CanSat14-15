@@ -38,11 +38,18 @@ CALCULATE = {
         "gas_constant": 287.06,
         "gravitational_accelleration": 9.82
     },
+    # "acc": {
+    #     "acc_calib": {
+    #         "x": [0.00075188, 0.0526312],
+    #         "y": [0.000749064, -0.0486896],
+    #         "z": [0.000719424, 0.08633152]
+    #     }
+    # }
     "acc": {
         "acc_calib": {
-            "x": [0.00077821, 0.0117],
-            "y": [0.00077821, -0.0117],
-            "z": [0.000772201, 0.0039]
+            "x": [1, 0],
+            "y": [1, 0],
+            "z": [1, 0]
         }
     }
 }
@@ -53,7 +60,7 @@ EXAMPLE_DATA_CONFIG = {
     "file": "file.log",
     "start_time": 0,
     "end_time": -1,
-    "ground_temperature": 0,
-    "ground_pressure": 100,
+    "ground_temperature": 10,
+    "ground_pressure": 101.59,
     "protocol_version": "live"
 }
